@@ -17,7 +17,7 @@ def solve(a, t):
             T = [[0] * width for _ in range(height)]
             for x1 in range(height):
                 for x2 in range(width):
-                    T[x1][x2] = a[x1][x2] * exp(-1 / 4 / t * ((i - x1) * 2 + (j - x2) * 2))
+                    T[x1][x2] = a[x1][x2] * exp(-1 / 4 / t * ((i - x1) ** 2 + (j - x2) ** 2))
             s = sum([sum(i) for i in T]) / 4 / pi / t
             new_a[i][j] = s
     return new_a
