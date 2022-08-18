@@ -27,7 +27,7 @@ class Node:
         if self.__x == x and self.__y == y:
             return self.__t
         else:
-            return None
+            return 0
 
     def __repr__(self):
         return self.__str__()
@@ -44,3 +44,9 @@ class Node:
             return True
 
         return False
+
+    def __add__(self, other):
+        return self.__t + other.get_t()
+
+    def __mul__(self, other):
+        return self.__t * other.get_t()
