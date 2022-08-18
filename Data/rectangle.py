@@ -12,7 +12,8 @@ class Rect:
 
     # basis function
     def check_domain(self, x: float, y: float):
-        if self.__lower_left.x() < x < self.__upper_right.x() and self.__lower_left.y() < y < self.__upper_right.y():
+        # TODO проверка на гранях и вероятно определение температуры на гранях прямоугольника
+        if self.__lower_left.x() <= x <= self.__upper_right.x() and self.__lower_left.y() < y < self.__upper_right.y():
             return self._temperature()
 
         return None
