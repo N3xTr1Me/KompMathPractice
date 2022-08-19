@@ -5,7 +5,7 @@ from Interfaces.basis import IBasis
 
 # a node-dot on the 2D grid. Has (x,y) coordinates, temperature and basis functions
 class Node(IBasis):
-    def __init__(self, x: float, y: float, basis_funcs: Dict[callable], t: float = None):
+    def __init__(self, x: float, y: float, basis_funcs: Dict[str, callable], t: float = None):
         super(Node, self).__init__()
 
         # initializing node's coordinates and temperature
