@@ -62,7 +62,18 @@ class Node(IBasis):
     # getter method for basis functions
     def basis(self, function):
         if function in self.__basis:
-            return self.__basis[function]
+            base = self.__basis[function]
+
+            # This part is supposed to modify the basis function in order to supply it
+            # with the current Node's coordinates
+
+            # def wrapper(x, y):
+            #     return base(self.x(), self.y(), x, y)
+            #
+            # return wrapper
+
+            return base
+
         raise KeyError(f"{function} not found among basis functions!")
 
 # ----------------------------------------------------------------------------------------------------------------------
