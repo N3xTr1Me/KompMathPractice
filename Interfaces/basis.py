@@ -6,7 +6,7 @@ from typing import Dict
 class IBasis(ABC):
 
     @abstractmethod
-    def initialize_basis(self, basis_functions: Dict[callable]) -> None:
+    def basis(self, function: str) -> callable:
         pass
 
     @abstractmethod
