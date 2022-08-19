@@ -3,7 +3,7 @@ from typing import Dict
 from Interfaces.basis import IBasis
 
 
-# a node-dot on the 2D grid. Has (x,y) coordinates and temperature
+# a node-dot on the 2D grid. Has (x,y) coordinates, temperature and basis functions
 class Node(IBasis):
     def __init__(self, x: float, y: float, basis_funcs: Dict[callable], t: float = None):
         super(Node, self).__init__()
