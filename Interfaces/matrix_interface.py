@@ -17,5 +17,5 @@ class IMatrix(ABC):
         pass
 
     @abstractmethod
-    def get_result(self) -> array:
+    def get_data(self) -> array:
         pass

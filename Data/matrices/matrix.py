@@ -32,13 +32,13 @@ class Matrix(IMatrix):
     def fill(self) -> None:
         self.__matrix = np.zeros((self.rows(), self.columns()))
 
-    def get_result(self) -> np.array:
+    def get_data(self) -> np.array:
         return self.__matrix
 
     def __add__(self, other):
         if self.rows() == other.rows() and self.columns() == other.columns():
 
-            new_matrix = self.get_result() + other.get_result()
+            new_matrix = self.get_data() + other.get_data()
             return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
 
         else:
@@ -47,7 +47,7 @@ class Matrix(IMatrix):
 
     def __mul__(self, other):
         if self.columns() == other.rows():
-            new_matrix = np.dot(self.get_result(), other.get_result())
+            new_matrix = np.dot(self.get_data(), other.get_data())
             return Matrix(rows=self.rows(), columns=other.columns(), data=new_matrix)
 
         else:
