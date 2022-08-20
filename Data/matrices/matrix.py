@@ -4,12 +4,12 @@ import numpy as np
 
 
 class Matrix(IMatrix):
-    def __init__(self, rows: int, columns: int, data: np.array):
+    def __init__(self, rows: int, columns: int, data: np.array = None):
         self.__rows = rows
         self.__columns = columns
         self.__matrix = None
 
-        if data:
+        if data is not None:
             if self.__check(data):
                 self.__matrix = data
             else:
@@ -42,7 +42,7 @@ class Matrix(IMatrix):
             return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
 
         else:
-            raise ValueError(f"Matrices' dimensions don't match: {self.rows(), self.columns()}/"
+            raise ValueError(f"Matrices' dimensions don't match: {self.rows(), self.columns()} / "
                              f"{other.rows(), other.columns()}!")
 
     def __mul__(self, other):
@@ -51,5 +51,5 @@ class Matrix(IMatrix):
             return Matrix(rows=self.rows(), columns=other.columns(), data=new_matrix)
 
         else:
-            raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and"
+            raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
                              f"{other.rows(), other.columns()}!")
