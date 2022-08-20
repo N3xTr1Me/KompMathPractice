@@ -35,6 +35,16 @@ class Matrix(IMatrix):
     def get_data(self) -> np.array:
         return self.__matrix
 
+    def update_data(self, data: np.array) -> None:
+        if self.__check(data):
+            self.__matrix = data
+        else:
+            raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
+
+    def change_value(self, row: int, column: int, value: float) -> None:
+        if self(row, column) is not None:
+            self.__matrix[row][column] = value
+
     def __add__(self, other):
         if self.rows() == other.rows() and self.columns() == other.columns():
 
@@ -53,3 +63,12 @@ class Matrix(IMatrix):
         else:
             raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
                              f"{other.rows(), other.columns()}!")
+
+    def __call__(self, row: int, column: int):
+        if 0 <= row < self.rows():
+            if 0 <= column < self.columns():
+                return self.__matrix[row][column]
+            else:
+                raise IndexError(f"column index ({column}) out of range!")
+        else:
+            raise IndexError(f"row index ({row}) out of range!")
