@@ -19,7 +19,7 @@ class Rectangle(IFinite):
     # ----------------------------------------------------------------------------------------------------------------------
 
     # TODO: figure out a way to correctly integrate coordinate-dependent basis functions
-    # P.S. for now the basis functions are uniform for all of the nodes
+    #  P.S. for now the basis functions are uniform for all of the nodes
 
     # returns the local mass matrix of the current finite element
     def mass(self, w: int, h: int) -> numpy.array:
