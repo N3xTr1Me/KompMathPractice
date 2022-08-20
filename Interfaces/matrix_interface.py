@@ -9,11 +9,11 @@ class IMatrix(ABC):
         pass
 
     @abstractmethod
-    def height(self) -> int:
+    def rows(self) -> int:
         pass
 
     @abstractmethod
-    def width(self) -> int:
+    def columns(self) -> int:
         pass
 
     @abstractmethod
