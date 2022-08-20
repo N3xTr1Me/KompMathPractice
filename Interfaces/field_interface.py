@@ -15,11 +15,11 @@ class IField(ABC):
         pass
 
     @abstractmethod
-    def _generate_nodes(self, basis: Dict[str, callable]) -> None:
+    def _generate_nodes(self, basis: Dict[str, callable]) -> list:
         pass
 
     @abstractmethod
-    def _map_mesh(self) -> None:
+    def _map_mesh(self) -> list:
         pass
 
     @abstractmethod
