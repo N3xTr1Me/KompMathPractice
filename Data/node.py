@@ -5,7 +5,7 @@ from Interfaces.basis import IBasis
 
 # a node-dot on the 2D grid. Has (x,y) coordinates, temperature and basis functions
 class Node(IBasis):
-    def __init__(self, x: float, y: float, basis_funcs: Dict[callable], t: float = None):
+    def __init__(self, x: float, y: float, basis_funcs: Dict[str, callable], t: float = None):
         super(Node, self).__init__()
 
         # initializing node's coordinates and temperature
@@ -62,7 +62,18 @@ class Node(IBasis):
     # getter method for basis functions
     def basis(self, function):
         if function in self.__basis:
-            return self.__basis[function]
+            base = self.__basis[function]
+
+            # This part is supposed to modify the basis function in order to supply it
+            # with the current Node's coordinates
+
+            # def wrapper(x, y):
+            #     return base(self.x(), self.y(), x, y)
+            #
+            # return wrapper
+
+            return base
+
         raise KeyError(f"{function} not found among basis functions!")
 
 # ----------------------------------------------------------------------------------------------------------------------
