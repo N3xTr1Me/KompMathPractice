@@ -3,6 +3,7 @@ from Interfaces.matrix_interface import IMatrix
 import numpy as np
 
 
+# Matrix wrapper class for calculations
 class Matrix(IMatrix):
     def __init__(self, rows: int, columns: int, data: np.array = None):
         self.__rows = rows
@@ -17,7 +18,8 @@ class Matrix(IMatrix):
         else:
             self.fill()
 
-    def __check(self, data: np.array):
+    # Checks the given arrays shape to be compatible with own shape.
+    def __check(self, data: np.array) -> bool:
         if self.__rows == data.shape[0] and self.__columns == data.shape[1]:
             return True
 
@@ -29,18 +31,21 @@ class Matrix(IMatrix):
     def columns(self) -> int:
         return self.__columns
 
+    # Fills matrix with values (zeroes).
     def fill(self) -> None:
         self.__matrix = np.zeros((self.rows(), self.columns()))
 
     def get_data(self) -> np.array:
         return self.__matrix
 
+    # changes all the matrix's values to ones from array if the given array's dimensions are compatible
     def update_data(self, data: np.array) -> None:
         if self.__check(data):
             self.__matrix = data
         else:
             raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
 
+    # changes a single value within the matrix
     def change_value(self, row: int, column: int, value: float) -> None:
         if self(row, column) is not None:
             self.__matrix[row][column] = value
@@ -64,6 +69,7 @@ class Matrix(IMatrix):
             raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
                              f"{other.rows(), other.columns()}!")
 
+    # allows calling matrix objects by indexes
     def __call__(self, row: int, column: int):
         if 0 <= row < self.rows():
             if 0 <= column < self.columns():
