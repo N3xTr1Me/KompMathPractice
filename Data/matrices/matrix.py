@@ -6,34 +6,35 @@ import numpy as np
 # Matrix wrapper class for calculations
 class Matrix(IMatrix):
     def __init__(self, rows: int, columns: int, data: np.array = None):
-        self.__rows = rows
-        self.__columns = columns
-        self.__matrix = None
+        # self.__rows = rows
+        # self.__columns = columns
+        self.__matrix = self.__create(rows, columns)
 
         if data is not None:
             if self.__check(data):
                 self.__matrix = data
             else:
-                raise ValueError(f"Given shape {self.__rows, self.__columns} doesn't match given array's {data.shape}!")
-        else:
-            self.fill()
+                raise ValueError(f"Given shape {self.rows(), self.columns()} doesn't match given array's {data.shape}!")
+
+    @staticmethod
+    def __create(rows: int, columns: int) -> np.array:
+        return np.zeros((rows, columns))
 
     # Checks the given arrays shape to be compatible with own shape.
     def __check(self, data: np.array) -> bool:
-        if self.__rows == data.shape[0] and self.__columns == data.shape[1]:
+        if self.rows() == data.shape[0] and self.rows() == data.shape[1]:
             return True
 
         return False
 
     def rows(self) -> int:
-        return self.__rows
+        return self.__matrix.shape[0]
 
     def columns(self) -> int:
-        return self.__columns
+        return self.__matrix.shape[1]
 
-    # Fills matrix with values (zeroes).
     def fill(self) -> None:
-        self.__matrix = np.zeros((self.rows(), self.columns()))
+        pass
 
     def get_data(self) -> np.array:
         return self.__matrix
@@ -44,6 +45,24 @@ class Matrix(IMatrix):
             self.__matrix = data
         else:
             raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
+
+    def merge(self, data: np.array, axis: int = 0) -> None:
+        if self.__check(data):
+
+            if axis == 0:
+                self.__matrix = np.concatenate((self.__matrix, data))
+            else:
+                self.__matrix = np.concatenate((self.__matrix, data), axis=1)
+        else:
+            if axis == 0 and self.columns() == data.shape[1]:
+                self.__matrix = np.concatenate((self.__matrix, data))
+
+            elif axis == 1 and self.rows() == data.shape[0]:
+                self.__matrix = np.concatenate((self.__matrix, data), axis=1)
+
+            else:
+                raise ValueError(f"Cannot merge {data.shape} array with {self.rows(), self.columns()} matrix along"
+                                 f" the given axis!")
 
     # changes a single value within the matrix
     def change_value(self, row: int, column: int, value: float) -> None:
