@@ -6,50 +6,49 @@ import numpy as np
 # Matrix wrapper class for calculations
 class Matrix(IMatrix):
     def __init__(self, rows: int, columns: int, data: np.array = None):
-        self.__rows = rows
-        self.__columns = columns
-        self.__matrix = None
+        self._rows = rows
+        self._columns = columns
 
         if data is not None:
             if self.__check(data):
-                self.__matrix = data
+                self._matrix = data
             else:
-                raise ValueError(f"Given shape {self.__rows, self.__columns} doesn't match given array's {data.shape}!")
+                raise ValueError(f"Given shape {self._rows, self._columns} doesn't match given array's {data.shape}!")
         else:
-            self.fill()
+            self._matrix = None
 
     # Checks the given arrays shape to be compatible with own shape.
     def __check(self, data: np.array) -> bool:
-        if self.__rows == data.shape[0] and self.__columns == data.shape[1]:
+        if self._rows == data.shape[0] and self._columns == data.shape[1]:
             return True
 
         return False
 
     def rows(self) -> int:
-        return self.__rows
+        return self._rows
 
     def columns(self) -> int:
-        return self.__columns
+        return self._columns
 
     # Fills matrix with values (zeroes).
     def fill(self) -> None:
-        self.__matrix = np.zeros((self.rows(), self.columns()))
+        self._matrix = np.zeros((self.rows(), self.columns()))
 
     def get_data(self) -> np.array:
-        return self.__matrix
+        return self._matrix
 
     # changes all the matrix's values to ones from array
     # if the given array's dimensions are compatible
     def update_data(self, data: np.array) -> None:
         if self.__check(data):
-            self.__matrix = data
+            self._matrix = data
         else:
             raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
 
     # changes a single value within the matrix
     def change_value(self, row: int, column: int, value: float) -> None:
         if self(row, column) is not None:
-            self.__matrix[row][column] = value
+            self._matrix[row][column] = value
 
     def __add__(self, other):
         if self.rows() == other.rows() and self.columns() == other.columns():
@@ -74,7 +73,7 @@ class Matrix(IMatrix):
     def __call__(self, row: int, column: int):
         if 0 <= row < self.rows():
             if 0 <= column < self.columns():
-                return self.__matrix[row][column]
+                return self._matrix[row][column]
             else:
                 raise IndexError(f"column index ({column}) out of range!")
         else:
@@ -84,6 +83,6 @@ class Matrix(IMatrix):
         output = ""
         for i in range(self.rows()):
             for j in range(self.columns()):
-                output += str(self.__matrix[i][j]) + "\t"
+                output += str(self._matrix[i][j]) + "\t"
             output += "\n"
         return output
