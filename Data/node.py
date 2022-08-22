@@ -71,9 +71,7 @@ class Node(IBasis):
             #     return base(self.x(), self.y(), x, y)
             #
             # return wrapper
-
             return base
-
         raise KeyError(f"{function} not found among basis functions!")
 
     # ----------------------------------------------------------------------------------------------------------------------
@@ -85,8 +83,6 @@ class Node(IBasis):
         return f"({self.__x},{self.__y}): {self.__t}"
 
     def __eq__(self, other):
-
         if self.__x == other.x() and self.__y == other.y():
             return True
-
         return False

@@ -14,5 +14,4 @@ class Boundary(IDomain):
         if self.__lower_left.x() < x < self.__upper_right.x() \
                 and self.__lower_left.y() < y < self.__upper_right.y():
             return True
-
         return False
