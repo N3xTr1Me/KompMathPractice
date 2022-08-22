@@ -14,7 +14,8 @@ class Matrix(IMatrix):
             if self.__check(data):
                 self.__matrix = data
             else:
-                raise ValueError(f"Given shape {self.__rows, self.__columns} doesn't match given array's {data.shape}!")
+                raise ValueError(f"Given shape {self.__rows, self.__columns} "
+                                 f"doesn't match given array's {data.shape}!")
         else:
             self.fill()
 
@@ -22,7 +23,6 @@ class Matrix(IMatrix):
     def __check(self, data: np.array) -> bool:
         if self.__rows == data.shape[0] and self.__columns == data.shape[1]:
             return True
-
         return False
 
     def rows(self) -> int:
@@ -44,7 +44,9 @@ class Matrix(IMatrix):
         if self.__check(data):
             self.__matrix = data
         else:
-            raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
+            raise ValueError(
+                f"Array's dimensions {data.shape} don't match matrix's "
+                f"{self.rows(), self.columns()}!")
 
     # changes a single value within the matrix
     def change_value(self, row: int, column: int, value: float) -> None:
@@ -67,7 +69,8 @@ class Matrix(IMatrix):
             return Matrix(rows=self.rows(), columns=other.columns(), data=new_matrix)
 
         else:
-            raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
+            raise ValueError(f"Cannot perform multiplication with shapes: "
+                             f"{self.rows(), self.columns()} and "
                              f"{other.rows(), other.columns()}!")
 
     # allows calling matrix objects by indexes
