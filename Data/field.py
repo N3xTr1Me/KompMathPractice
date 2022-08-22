@@ -9,7 +9,8 @@ import random
 
 
 class Field(IField):
-    def __init__(self, width: int, height: int, basis: Dict[str, callable], heat_source: List[float] = None):
+    def __init__(self, width: int, height: int, basis: Dict[str, callable],
+                 heat_source: List[float] = None):
         self.__width = width
         self.__height = height
 
@@ -35,8 +36,8 @@ class Field(IField):
     def _columns(self) -> int:
         return self.get_width() - 1
 
-    # Returns the number of finite elements on the field. The first digit is number of rows and second is the number of
-    # elements in each row
+    # Returns the number of finite elements on the field.
+    # The first digit is number of rows and second is the number of elements in each row
     def elements(self) -> Tuple[int, int]:
         return self._rows(), self._columns()
 

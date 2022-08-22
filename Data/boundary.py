@@ -13,7 +13,6 @@ class Boundary(IDomain):
     def within(self, x: float, y: float) -> bool:
         if self.__lower_left.x() < x < self.__upper_right.x() \
                 and self.__lower_left.y() < y < self.__upper_right.y():
-
             return True
 
         return False

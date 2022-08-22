@@ -38,7 +38,8 @@ class Matrix(IMatrix):
     def get_data(self) -> np.array:
         return self.__matrix
 
-    # changes all the matrix's values to ones from array if the given array's dimensions are compatible
+    # changes all the matrix's values to ones from array
+    # if the given array's dimensions are compatible
     def update_data(self, data: np.array) -> None:
         if self.__check(data):
             self.__matrix = data
@@ -78,3 +79,11 @@ class Matrix(IMatrix):
                 raise IndexError(f"column index ({column}) out of range!")
         else:
             raise IndexError(f"row index ({row}) out of range!")
+
+    def __str__(self):
+        output = ""
+        for i in range(self.rows()):
+            for j in range(self.columns()):
+                output += str(self.__matrix[i][j]) + "\t"
+            output += "\n"
+        return output
