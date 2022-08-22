@@ -31,10 +31,10 @@ class Field(IField):
         return self.get_width(), self.get_height()
 
     def _rows(self) -> int:
-        return self.get_height() - 1
+        return self.get_height() - 3
 
     def _columns(self) -> int:
-        return self.get_width() - 1
+        return self.get_width() - 3
 
     # Returns the number of finite elements on the field.
     # The first digit is number of rows and second is the number of elements in each row
@@ -66,16 +66,14 @@ class Field(IField):
 
         for i in range(0, n):
             for j in range(0, m):
-                mesh[i].append(Rectangle(self.__grid[i][j], self.__grid[i + 1][j],
-                                         self.__grid[i + 1][j + 1], self.__grid[i][j + 1]))
+                mesh[i].append(Rectangle(self.__grid[i + 1][j + 1], self.__grid[i + 2][j + 1],
+                                         self.__grid[i + 2][j + 2], self.__grid[i + 1][j + 2]))
 
         return mesh
 
     # Returns the mass matrix of the given finite element
     def get_mass(self, row: int, index: int):
-        if self.__area.within(index, row):
-            return self.__mesh[row][index].mass(w=self.__width - 2, h=self.__height - 2)
-        return None
+        return self.__mesh[row][index].mass(w=self.__width - 2, h=self.__height - 2)
 
     # Returns the stiffness matrix of the given finite element
     def get_stiffness(self, row: int, index: int):
