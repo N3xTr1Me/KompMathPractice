@@ -25,43 +25,38 @@ class Rectangle(IFinite):
     def mass(self, w: int, h: int) -> numpy.array:
         result = numpy.zeros((2, 2), dtype=float)
 
-        result[0][0] = \
-        dblquad(lambda x, y: self.__upper_left.phi_1()(x, y) * self.__upper_left.phi_1()(x, y), 0,
-                h,
-                lambda x: 0, lambda x: w)[0]
+        result[0][0] = dblquad(
+            lambda x, y: self.__upper_left.phi_1()(x, y) * self.__upper_left.phi_1()(x, y),
+            0, h, lambda x: 0, lambda x: w)[0]
 
-        result[0][1] = \
-        dblquad(lambda x, y: self.__upper_right.phi_1()(x, y) * self.__upper_right.phi_2()(x, y), 0,
-                h,
-                lambda x: 0, lambda x: w)[0]
+        result[0][1] = dblquad(
+            lambda x, y: self.__upper_right.phi_1()(x, y) * self.__upper_right.phi_2()(x, y),
+            0, h, lambda x: 0, lambda x: w)[0]
 
-        result[1][0] = \
-        dblquad(lambda x, y: self.__lower_left.phi_2()(x, y) * self.__lower_left.phi_1()(x, y), 0,
-                h,
-                lambda x: 0, lambda x: w)[0]
+        result[1][0] = dblquad(
+            lambda x, y: self.__lower_left.phi_2()(x, y) * self.__lower_left.phi_1()(x, y),
+            0, h, lambda x: 0, lambda x: w)[0]
 
-        result[1][1] = \
-        dblquad(lambda x, y: self.__lower_right.phi_2()(x, y) * self.__lower_right.phi_2()(x, y), 0,
-                h,
-                lambda x: 0, lambda x: w)[0]
-
+        result[1][1] = dblquad(
+            lambda x, y: self.__lower_right.phi_2()(x, y) * self.__lower_right.phi_2()(x, y),
+            0, h, lambda x: 0, lambda x: w)[0]
         return result
 
     # returns the local stiffness matrix of the current finite element
     def stiffness(self, w: int, h: int) -> numpy.array:
         result = numpy.zeros((2, 2), dtype=float)
 
-        result[0][0] = \
-        dblquad(lambda x, y: self.__upper_left.d_phi_1()(x, y) * self.__upper_left.d_phi_1()(x, y),
-                0, h, lambda x: 0, lambda x: w)[0]
+        result[0][0] = dblquad(
+            lambda x, y: self.__upper_left.d_phi_1()(x, y) * self.__upper_left.d_phi_1()(x, y),
+            0, h, lambda x: 0, lambda x: w)[0]
 
         result[0][1] = dblquad(
             lambda x, y: self.__upper_right.d_phi_1()(x, y) * self.__upper_right.d_phi_2()(x, y),
             0, h, lambda x: 0, lambda x: w)[0]
 
-        result[1][0] = \
-        dblquad(lambda x, y: self.__lower_left.d_phi_2()(x, y) * self.__lower_left.d_phi_1()(x, y),
-                0, h, lambda x: 0, lambda x: w)[0]
+        result[1][0] = dblquad(
+            lambda x, y: self.__lower_left.d_phi_2()(x, y) * self.__lower_left.d_phi_1()(x, y),
+            0, h, lambda x: 0, lambda x: w)[0]
 
         result[1][1] = dblquad(
             lambda x, y: self.__lower_right.d_phi_2()(x, y) * self.__lower_right.d_phi_2()(x, y),
