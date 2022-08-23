@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class IDomain(ABC):
+class IBorder(ABC):
 
     @abstractmethod
     def within(self, x: float, y: float) -> bool:

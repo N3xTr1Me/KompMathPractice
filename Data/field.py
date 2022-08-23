@@ -1,4 +1,4 @@
-from Data.boundary import Boundary
+from Data.border import Border
 from Data.node import Node
 from Data.rectangle import Rectangle
 
@@ -18,7 +18,7 @@ class Field(IField):
         self.__height = height
 
         # Field border and thermal source
-        self.__area = Boundary(Node(0, 0, basis), Node(self.get_width() - 1, self.get_height() - 1, basis))
+        self.__area = Border(Node(0, 0, basis), Node(self.get_width() - 1, self.get_height() - 1, basis))
         self.__heat_source = heat_source
 
         # Table of nodes on the field
