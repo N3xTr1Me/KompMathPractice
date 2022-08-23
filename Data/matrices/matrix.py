@@ -45,6 +45,35 @@ class Matrix(IMatrix):
         else:
             raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
 
+    def _update_dimensions(self):
+        dimensions = self.get_data().shape
+
+        if self.rows() != dimensions[0]:
+            self._rows = dimensions[0]
+
+        if self.columns() != dimensions[1]:
+            self._columns = dimensions[1]
+
+    def merge(self, data: np.array, axis: int = 0) -> None:
+        if self.__check(data):
+
+            if axis == 0:
+                self._matrix = np.concatenate((self._matrix, data))
+            else:
+                self._matrix = np.concatenate((self._matrix, data), axis=1)
+        else:
+            if axis == 0 and self.columns() == data.shape[1]:
+                self._matrix = np.concatenate((self._matrix, data))
+
+            elif axis == 1 and self.rows() == data.shape[0]:
+                self._matrix = np.concatenate((self._matrix, data), axis=1)
+
+            else:
+                raise ValueError(f"Cannot merge {data.shape} array with {self.rows(), self.columns()} matrix along"
+                                 f" the given axis!")
+
+        self._update_dimensions()
+
     # changes a single value within the matrix
     def change_value(self, row: int, column: int, value: float) -> None:
         if self(row, column) is not None:
