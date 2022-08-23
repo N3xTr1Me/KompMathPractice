@@ -1,11 +1,11 @@
 import numpy as np
 
 from Data.matrices.matrix import Matrix
-from Data.field import Field
+from Data.domain import Domain
 
 
 class MassMatrix(Matrix):
-    def __init__(self, source: Field, redefine: bool = False):
+    def __init__(self, source: Domain, redefine: bool = False):
 
         rows, columns = source.rows(), source.columns()
         super(MassMatrix, self).__init__(rows=rows, columns=columns)

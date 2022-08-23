@@ -9,7 +9,7 @@ import random
 
 
 # A flyweight class, containing all the data defining the 2D region, which thermal conditions are to be found
-class Field(IDomain):
+class Domain(IDomain):
     def __init__(self, width: int, height: int, basis: Dict[str, callable],
                  heat_source: List[float] = None):
 
