@@ -1,32 +1,14 @@
-from typing import Dict
-
-from Interfaces.basis import IBasis
 
 
 # a node-dot on the 2D grid. Has (x,y) coordinates, temperature and basis functions
-class Node(IBasis):
-    def __init__(self, x: float, y: float, basis_funcs: Dict[str, callable], t: float = None):
+class Node:
+    def __init__(self, x: float, y: float, t: float = None):
         super(Node, self).__init__()
 
         # initializing node's coordinates and temperature
         self.__x = x
         self.__y = y
         self.__t = t
-
-        # checking the minimal basis requirements
-        if "phi_1" not in basis_funcs:
-            raise ValueError("phi_1 not found in basis!")
-        elif "phi_2" not in basis_funcs:
-            raise ValueError("phi_2 not found in basis!")
-        elif "d_phi_1" not in basis_funcs:
-            raise ValueError("d_phi_1 not found in basis!")
-        elif "d_phi_2" not in basis_funcs:
-            raise ValueError("d_phi_2 not found in basis!")
-
-        # initializing node's basis
-        self.__basis = dict()
-        for func in basis_funcs:
-            self.__basis[func] = basis_funcs[func]
 
     # ----------------------------------------------------------------------------------------------------------------------
 
@@ -41,38 +23,6 @@ class Node(IBasis):
 
     def set_t(self, value: float) -> None:
         self.__t = value
-
-    # ----------------------------------------------------------------------------------------------------------------------
-    # first basis function for node
-    def phi_1(self) -> callable:
-        return self.basis("phi_1")
-
-    # second basis function for node
-    def phi_2(self) -> callable:
-        return self.basis("phi_2")
-
-    # first derivative of the first basis function for node
-    def d_phi_1(self) -> callable:
-        return self.basis("d_phi_1")
-
-    # first derivative of the second basis function for node
-    def d_phi_2(self) -> callable:
-        return self.basis("d_phi_2")
-
-    # getter method for basis functions
-    def basis(self, function):
-        if function in self.__basis:
-            base = self.__basis[function]
-
-            # This part is supposed to modify the basis function in order to supply it
-            # with the current Node's coordinates
-
-            # def wrapper(x, y):
-            #     return base(self.x(), self.y(), x, y)
-            #
-            # return wrapper
-            return base
-        raise KeyError(f"{function} not found among basis functions!")
 
     # ----------------------------------------------------------------------------------------------------------------------
 
