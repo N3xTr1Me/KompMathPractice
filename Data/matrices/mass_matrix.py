@@ -7,7 +7,7 @@ from Data.field import Field
 class MassMatrix(Matrix):
     def __init__(self, source: Field, redefine: bool = False):
 
-        rows, columns = source.dimensions()
+        rows, columns = source.rows(), source.columns()
         super(MassMatrix, self).__init__(rows=rows, columns=columns)
 
         self._source = source
@@ -19,7 +19,7 @@ class MassMatrix(Matrix):
         return self._source.get_mass(row, index)
 
     def fill(self):
-        rows, columns = self._source.elements()[0], self._source.elements()[1]
+        rows, columns = self._source.rows(), self._source.columns()
         matrix = None
 
         for i in range(rows):
