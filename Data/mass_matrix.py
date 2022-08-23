@@ -1,36 +1,40 @@
-import random as rd
 import numpy as np
 
-from Data.node import Node
 from Data.matrices.matrix import Matrix
-
 from Data.field import Field
-
-max_temperature = 10
 
 
 class MassMatrix(Matrix):
-    def __init__(self, rows: int, columns: int, field: Field):
+    def __init__(self, source: Field):
 
+        rows, columns = source.dimensions()
         super(MassMatrix, self).__init__(rows=rows, columns=columns)
 
-        # self.matrix = np.zeroes(width-2, length-2)
-        self.__columns = super().columns()
-        self.__rows = super().rows()
+        self._source = source
 
-        self.matrix = [[0 for _ in range(self.__columns)] for _ in range(self.__rows)]
-        self.__center = [self.__columns // 2, self.__rows // 2]
+        self.fill()
 
-        self.fill(field)
+    def _get_from_src(self, row: int, index: int) -> np.array:
+        return self._source.get_mass(row, index)
 
-    def fill(self, field: Field):
-        self.matrix = field.grid()
+    def fill(self):
+        rows, columns = self._source.elements()[0], self._source.elements()[1]
+        matrix = None
 
+        for i in range(rows):
 
-one = MassMatrix(5, 5)
-two = MassMatrix(5, 5)
-print(one * two)
+            data = self._get_from_src(i, 0)
+            row = Matrix(data.shape[0], data.shape[1], data)
 
-print()
+            for j in range(1, columns):
+                print(i, j)
+                row.merge(self._get_from_src(i, j), axis=1)
 
-print(one + two)
+            if i == 0:
+                matrix = row
+
+            else:
+                matrix.merge(row.get_data())
+
+        self._matrix = matrix.get_data()
+        self._update_dimensions()
