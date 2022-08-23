@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from Data.node import Node
+
 
 class IBasis(ABC):
 
@@ -8,17 +10,17 @@ class IBasis(ABC):
         pass
 
     @abstractmethod
-    def phi_1(self) -> callable:
+    def _phi_1(self, dot: Node, w: int, h: int) -> float:
         pass
 
     @abstractmethod
-    def phi_2(self) -> callable:
+    def _phi_2(self, dot: Node, w: int, h: int) -> float:
         pass
 
     @abstractmethod
-    def d_phi_1(self) -> callable:
+    def _d_phi_1(self, dot: Node, w: int, h: int) -> float:
         pass
 
     @abstractmethod
-    def d_phi_2(self) -> callable:
+    def _d_phi_2(self, dot: Node, w: int, h: int) -> float:
         pass
