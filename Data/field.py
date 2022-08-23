@@ -77,6 +77,4 @@ class Field(IField):
 
     # Returns the stiffness matrix of the given finite element
     def get_stiffness(self, row: int, index: int):
-        if self.__area.within(index, row):
-            return self.__mesh[row][index].stiffness(w=self.__width - 2, h=self.__height - 2)
-        return None
+        return self.__mesh[row][index].stiffness(w=self.__width - 2, h=self.__height - 2)
