@@ -1,17 +1,17 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict
+from typing import Dict
 
 from numpy import array
 
 
-class IField(ABC):
+class IDomain(ABC):
 
     @abstractmethod
-    def dimensions(self) -> Tuple[int, int]:
+    def rows(self) -> int:
         pass
 
     @abstractmethod
-    def elements(self) -> Tuple[int, int]:
+    def columns(self) -> int:
         pass
 
     @abstractmethod
@@ -23,9 +23,9 @@ class IField(ABC):
         pass
 
     @abstractmethod
-    def get_mass(self, row: int, index: int) -> array:
+    def get_mass(self, row: int, column: int) -> array:
         pass
 
     @abstractmethod
-    def get_stiffness(self, row: int, index: int) -> array:
+    def get_stiffness(self, row: int, column: int) -> array:
         pass

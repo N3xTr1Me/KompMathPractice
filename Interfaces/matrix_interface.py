@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from numpy import array
+import numpy as np
 
 
 class IMatrix(ABC):
@@ -17,14 +17,21 @@ class IMatrix(ABC):
         pass
 
     @abstractmethod
-    def get_data(self) -> array:
+    def get_data(self) -> np.array:
         pass
 
     @abstractmethod
-    def update_data(self, data: array) -> None:
+    def update_data(self, data: np.array) -> None:
         pass
 
     @abstractmethod
     def change_value(self, row: int, column: int, value: float) -> None:
         pass
- 
+
+    @abstractmethod
+    def merge(self, data: np.array, axis: int = 0) -> None:
+        pass
+    
+    @abstractmethod
+    def _update_dimensions(self) -> None:
+        pass
