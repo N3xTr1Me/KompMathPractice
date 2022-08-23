@@ -2,14 +2,14 @@ from Data.border import Border
 from Data.node import Node
 from Data.rectangle import Rectangle
 
-from Interfaces.field_interface import IField
+from Interfaces.domain_interface import IDomain
 
 from typing import List, Dict
 import random
 
 
 # A flyweight class, containing all the data defining the 2D region, which thermal conditions are to be found
-class Field(IField):
+class Field(IDomain):
     def __init__(self, width: int, height: int, basis: Dict[str, callable],
                  heat_source: List[float] = None):
 

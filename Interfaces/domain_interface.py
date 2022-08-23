@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Tuple, Dict
+from typing import Dict
 
 from numpy import array
 
 
-class IField(ABC):
+class IDomain(ABC):
 
     @abstractmethod
     def rows(self) -> int:
