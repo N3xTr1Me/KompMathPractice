@@ -1,10 +1,10 @@
-from Interfaces.domain import IDomain
+from Interfaces.border_interface import IBorder
 from Data.node import Node
 
 
-class Boundary(IDomain):
+class Border(IBorder):
     def __init__(self, lower_left: Node, upper_right: Node):
-        super(Boundary, self).__init__()
+        super(Border, self).__init__()
 
         self.__lower_left = lower_left
         self.__upper_right = upper_right
