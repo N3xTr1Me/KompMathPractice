@@ -108,10 +108,10 @@ basis = {"phi_1": lambda x, y, w, h: (x + w) - (4 * y - h) + 1,
          "d_phi_2": lambda x, y, w, h: 2
          }
 
-_first = Node(2, 2)
-_second = Node(2, 3)
-_third = Node(3, 3)
-_fourth = Node(3, 2)
+_first = Node(3, 2)
+_second = Node(2, 2)
+_third = Node(2, 3)
+_fourth = Node(3, 3)
 
 rect = Rectangle(_first, _second, _third, _fourth, basis)
 
