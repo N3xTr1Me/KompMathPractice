@@ -77,3 +77,7 @@ class Domain(IDomain):
     # Returns the stiffness matrix of the given finite element
     def get_stiffness(self, row: int, column: int):
         return self.__mesh[row][column].stiffness(w=self.__width - 2, h=self.__height - 2)
+
+    def update_t(self, row: int, column: int, value: float):
+        self.__grid[row][column].set_t(value)
+     
