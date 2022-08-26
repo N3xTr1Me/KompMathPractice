@@ -31,7 +31,7 @@ class Matrix(IMatrix):
         return self._columns
 
     # Fills matrix with values (zeroes).
-    def fill(self) -> None:
+    def _fill(self) -> None:
         self._matrix = np.zeros((self.rows(), self.columns()))
 
     def get_data(self) -> np.array:
@@ -45,14 +45,13 @@ class Matrix(IMatrix):
         else:
             raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
 
-    def _update_dimensions(self):
-        dimensions = self.get_data().shape
+    def _update_dimensions(self, rows: int, columns: int) -> None:
 
-        if self.rows() != dimensions[0]:
-            self._rows = dimensions[0]
+        if self.rows() != rows:
+            self._rows = rows
 
-        if self.columns() != dimensions[1]:
-            self._columns = dimensions[1]
+        if self.columns() != columns:
+            self._columns = columns
 
     def merge(self, data: np.array, axis: int = 0) -> None:
         if self.__check(data):
@@ -72,7 +71,7 @@ class Matrix(IMatrix):
                 raise ValueError(f"Cannot merge {data.shape} array with {self.rows(), self.columns()} matrix along"
                                  f" the given axis!")
 
-        self._update_dimensions()
+        self._update_dimensions(data.shape[0], data.shape[1])
 
     # changes a single value within the matrix
     def change_value(self, row: int, column: int, value: float) -> None:

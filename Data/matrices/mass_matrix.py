@@ -13,12 +13,12 @@ class MassMatrix(Matrix):
         self._source = source
 
         if not redefine:
-            self.fill()
+            self._fill()
 
     def _get_from_src(self, row: int, index: int) -> np.array:
         return self._source.get_mass(row, index)
 
-    def fill(self):
+    def _fill(self):
         rows, columns = self._source.rows(), self._source.columns()
         matrix = None
 
@@ -37,4 +37,4 @@ class MassMatrix(Matrix):
                 matrix.merge(row.get_data())
 
         self._matrix = matrix.get_data()
-        self._update_dimensions()
+        self._update_dimensions(self._source.rows() * 2, self._source.columns() * 2)

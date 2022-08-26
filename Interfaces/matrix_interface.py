@@ -5,7 +5,7 @@ import numpy as np
 
 class IMatrix(ABC):
     @abstractmethod
-    def fill(self) -> None:
+    def _fill(self) -> None:
         pass
 
     @abstractmethod
@@ -31,7 +31,7 @@ class IMatrix(ABC):
     @abstractmethod
     def merge(self, data: np.array, axis: int = 0) -> None:
         pass
-    
+
     @abstractmethod
-    def _update_dimensions(self) -> None:
+    def _update_dimensions(self, rows: int, columns: int) -> None:
         pass
