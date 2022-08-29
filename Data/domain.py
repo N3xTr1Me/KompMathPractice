@@ -18,13 +18,13 @@ class Domain(IDomain):
         self.__height = height
 
         # Field border and thermal source
-        self.__area = Border(Node(0, 0, basis), Node(self.get_width() - 1, self.get_height() - 1, basis))
+        self.__area = Border(Node(0, 0), Node(self.get_width() - 1, self.get_height() - 1))
         self.__heat_source = heat_source
 
         # Table of nodes on the field
-        self.__grid = self._generate_nodes(basis)
+        self.__grid = self._generate_nodes()
         # Table of finite elements, built on the field nodes
-        self.__mesh = self._map_mesh()
+        self.__mesh = self._map_mesh(basis)
 
     def get_height(self) -> int:
         return self.__height
@@ -41,7 +41,7 @@ class Domain(IDomain):
         return self.get_width() - 3
 
     # Fills the field with nodes
-    def _generate_nodes(self, basis: Dict[str, callable]) -> list:
+    def _generate_nodes(self) -> list:
         n, m = self.get_height(), self.get_width()
 
         grid = [[None for _ in range(m)] for _ in range(n)]
@@ -53,12 +53,12 @@ class Domain(IDomain):
                 else:
                     t = 0
 
-                grid[i][j] = Node(j, i, basis, t)
+                grid[i][j] = Node(j, i, t)
 
         return grid
 
     # Constructs the rectangular finite elements from the nodes on the field
-    def _map_mesh(self) -> list:
+    def _map_mesh(self, basis: Dict[str, callable]) -> list:
         rows, columns = self.rows(), self.columns()
 
         mesh = [[] for _ in range(rows)]
@@ -66,7 +66,7 @@ class Domain(IDomain):
         for i in range(0, rows):
             for j in range(0, columns):
                 mesh[i].append(Rectangle(self.__grid[i + 1][j + 1], self.__grid[i + 2][j + 1],
-                                         self.__grid[i + 2][j + 2], self.__grid[i + 1][j + 2]))
+                                         self.__grid[i + 2][j + 2], self.__grid[i + 1][j + 2], basis_funcs=basis))
 
         return mesh
 
@@ -80,4 +80,3 @@ class Domain(IDomain):
 
     def update_t(self, row: int, column: int, value: float):
         self.__grid[row][column].set_t(value)
-     
