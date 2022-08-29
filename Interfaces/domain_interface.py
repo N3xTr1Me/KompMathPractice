@@ -15,11 +15,11 @@ class IDomain(ABC):
         pass
 
     @abstractmethod
-    def _generate_nodes(self, basis: Dict[str, callable]) -> list:
+    def _generate_nodes(self) -> list:
         pass
 
     @abstractmethod
-    def _map_mesh(self) -> list:
+    def _map_mesh(self, basis: Dict[str, callable]) -> list:
         pass
 
     @abstractmethod
