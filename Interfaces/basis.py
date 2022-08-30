@@ -1,9 +1,10 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
+from Interfaces.finite_element import IFinite
 from Data.node import Node
 
 
-class IBasis(ABC):
+class IBasis(IFinite):
 
     @abstractmethod
     def basis(self, function: str) -> callable:
