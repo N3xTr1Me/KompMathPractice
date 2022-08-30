@@ -1,4 +1,3 @@
-from Interfaces.finite_element import IFinite
 from Interfaces.basis import IBasis
 from Data.node import Node
 
@@ -7,7 +6,7 @@ import numpy
 from scipy.integrate import dblquad
 
 
-class Rectangle(IFinite, IBasis):
+class Rectangle(IBasis):
     def __init__(self, first: Node, second: Node, third: Node, fourth: Node, basis_funcs: Dict[str, callable]):
         super(Rectangle, self).__init__()
 
@@ -108,10 +107,10 @@ basis = {"phi_1": lambda x, y, w, h: (x + w) - (4 * y - h) + 1,
          "d_phi_2": lambda x, y, w, h: 2
          }
 
-_first = Node(3, 2)
-_second = Node(2, 2)
-_third = Node(2, 3)
-_fourth = Node(3, 3)
+_first = Node(4, 3)
+_second = Node(3, 3)
+_third = Node(3, 4)
+_fourth = Node(4, 4)
 
 rect = Rectangle(_first, _second, _third, _fourth, basis)
 
