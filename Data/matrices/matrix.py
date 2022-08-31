@@ -1,11 +1,16 @@
 from Interfaces.matrix_interface import IMatrix
+from Interfaces.decomposition import IDecomposition
 
+from typing import Dict
+from copy import deepcopy
 import numpy as np
 
 
 # Matrix wrapper class for calculations
-class Matrix(IMatrix):
+class Matrix(IMatrix, IDecomposition):
     def __init__(self, rows: int, columns: int, data: np.array = None):
+        super(Matrix, self).__init__()
+
         self._rows = rows
         self._columns = columns
 
@@ -16,6 +21,10 @@ class Matrix(IMatrix):
                 raise ValueError(f"Given shape {self._rows, self._columns} doesn't match given array's {data.shape}!")
         else:
             self._matrix = None
+
+    # ------------------------------------------------------------------------------------------------------------------
+    #                                        Basic functionality
+    # ------------------------------------------------------------------------------------------------------------------
 
     # Checks the given arrays shape to be compatible with own shape.
     def __check(self, data: np.array) -> bool:
@@ -33,6 +42,10 @@ class Matrix(IMatrix):
     # Fills matrix with values (zeroes).
     def _fill(self) -> None:
         self._matrix = np.zeros((self.rows(), self.columns()))
+
+    # ------------------------------------------------------------------------------------------------------------------
+    #                                        Data manipulation
+    # ------------------------------------------------------------------------------------------------------------------
 
     def get_data(self) -> np.array:
         return self._matrix
@@ -78,6 +91,75 @@ class Matrix(IMatrix):
         if self(row, column) is not None:
             self._matrix[row][column] = value
 
+    # ------------------------------------------------------------------------------------------------------------------
+    #                                        Matrix decomposition
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def LU(self, matrix: np.array = None) -> Dict[str, np.array]:
+
+        if matrix is None:
+            matrix = self._matrix
+
+        rows, columns = len(matrix), len(matrix[0])
+
+        L, U = np.zeros((rows, rows)), np.zeros((rows, columns))
+
+        U[0][0] = matrix[0][0]
+        L[0][0] = 1
+
+        if len(matrix) > 1 or len(matrix[0]) > 1:
+            U[0:1, 1:len(U[0])] = matrix[0:1, 1:len(U[0])]
+            L[1:len(L), 0:1] = matrix[1:len(L), 0:1] / U[0][0]
+            small_rectangle = matrix[1:len(matrix), 1: len(matrix[0])] - L[1:len(L), 0:1] * U[0:1, 1:len(U[0])]
+
+            if len(matrix) > 1 and len(matrix[0]) > 1:
+                result = self.LU(small_rectangle)
+                L[1:len(L), 1:len(L[0])], U[1:len(U), 1:len(U[0])] = result["L"], result["U"]
+
+        return {"L": L, "U": U}
+
+    def LUP(self, matrix: np.array = None) -> Dict[str, np.array]:
+        if matrix is None:
+            matrix = self._matrix
+
+        matrix = matrix.tolist()
+
+        n = max(len(matrix), len(matrix[0]))
+        C = deepcopy(matrix)
+
+        P = np.eye(n)
+
+        for i in range(n):
+            pivotValue = 0
+            pivot = -1
+            for row in range(i, n):
+                if abs(C[row][i]) > pivotValue:
+                    pivotValue = abs(C[row][i])
+                    pivot = row
+            if pivotValue != 0:
+                P[pivot], P[i] = deepcopy(P[i]), deepcopy(P[pivot])
+                C[pivot], C[i] = deepcopy(C[i]), deepcopy(C[pivot])
+                for j in range(i + 1, n):
+                    C[j][i] /= C[i][i]
+                    for k in range(i + 1, n):
+                        C[j][k] -= C[j][i] * C[i][k]
+
+        L = np.zeros((n, n))
+        U = np.zeros((n, n))
+        for i in range(n):
+            for j in range(n):
+                if i > j:
+                    L[i][j] = C[i][j]
+                else:
+                    U[i][j] = C[i][j]
+                    L[i][i] = 1
+
+        return {"L": L, "U": U, "P": P}
+
+    # ------------------------------------------------------------------------------------------------------------------
+    #                                        object functions overriding
+    # ------------------------------------------------------------------------------------------------------------------
+
     def __add__(self, other):
         if self.rows() == other.rows() and self.columns() == other.columns():
 
@@ -114,3 +196,31 @@ class Matrix(IMatrix):
                 output += str(self._matrix[i][j]) + "\t"
             output += "\n"
         return output
+
+
+exp1 = [
+    [2, 7, -6],
+    [8, 2, 1],
+    [7, 4, 2]
+]
+
+# L
+# [[1.         0.         0.        ]
+#  [0.25       1.         0.        ]
+#  [0.875      0.34615385 1.        ]]
+#
+# U
+# [[ 8.          2.          1.        ]
+#  [ 0.          6.5        -6.25      ]
+#  [ 0.          0.          3.28846154]]
+#
+# P
+# [[0. 1. 0.]
+#  [1. 0. 0.]
+#  [0. 0. 1.]]
+
+
+current_example = np.array(exp1)
+
+mat = Matrix(3, 3, current_example)
+print(mat.LUP())
