@@ -122,6 +122,8 @@ class Matrix(IMatrix, IDecomposition):
         if matrix is None:
             matrix = self._matrix
 
+        matrix = matrix.tolist()
+
         n = max(len(matrix), len(matrix[0]))
         C = deepcopy(matrix)
 
@@ -134,7 +136,6 @@ class Matrix(IMatrix, IDecomposition):
                 if abs(C[row][i]) > pivotValue:
                     pivotValue = abs(C[row][i])
                     pivot = row
-
             if pivotValue != 0:
                 P[pivot], P[i] = deepcopy(P[i]), deepcopy(P[pivot])
                 C[pivot], C[i] = deepcopy(C[i]), deepcopy(C[pivot])
@@ -202,6 +203,22 @@ exp1 = [
     [8, 2, 1],
     [7, 4, 2]
 ]
+
+# L
+# [[1.         0.         0.        ]
+#  [0.25       1.         0.        ]
+#  [0.875      0.34615385 1.        ]]
+#
+# U
+# [[ 8.          2.          1.        ]
+#  [ 0.          6.5        -6.25      ]
+#  [ 0.          0.          3.28846154]]
+#
+# P
+# [[0. 1. 0.]
+#  [1. 0. 0.]
+#  [0. 0. 1.]]
+
 
 current_example = np.array(exp1)
 
