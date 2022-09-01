@@ -58,13 +58,13 @@ class Matrix(IMatrix, IDecomposition):
         else:
             raise ValueError(f"Array's dimensions {data.shape} don't match matrix's {self.rows(), self.columns()}!")
 
-    def _update_dimensions(self, rows: int, columns: int) -> None:
+    def _update_dimensions(self) -> None:
 
-        if self.rows() != rows:
-            self._rows = rows
+        if self.rows() != self._matrix.shape[0]:
+            self._rows = self._matrix.shape[0]
 
-        if self.columns() != columns:
-            self._columns = columns
+        if self.columns() != self._matrix.shape[1]:
+            self._columns = self._matrix.shape[1]
 
     def merge(self, data: np.array, axis: int = 0) -> None:
         if self.__check(data):
@@ -84,7 +84,7 @@ class Matrix(IMatrix, IDecomposition):
                 raise ValueError(f"Cannot merge {data.shape} array with {self.rows(), self.columns()} matrix along"
                                  f" the given axis!")
 
-        self._update_dimensions(data.shape[0], data.shape[1])
+        self._update_dimensions()
 
     # changes a single value within the matrix
     def change_value(self, row: int, column: int, value: float) -> None:
@@ -171,6 +171,8 @@ class Matrix(IMatrix, IDecomposition):
                              f"{other.rows(), other.columns()}!")
 
     def __mul__(self, other):
+        # TODO: add multiplication by number
+
         if self.columns() == other.rows():
             new_matrix = np.dot(self.get_data(), other.get_data())
             return Matrix(rows=self.rows(), columns=other.columns(), data=new_matrix)
@@ -190,37 +192,4 @@ class Matrix(IMatrix, IDecomposition):
             raise IndexError(f"row index ({row}) out of range!")
 
     def __str__(self):
-        output = ""
-        for i in range(self.rows()):
-            for j in range(self.columns()):
-                output += str(self._matrix[i][j]) + "\t"
-            output += "\n"
-        return output
-
-
-exp1 = [
-    [2, 7, -6],
-    [8, 2, 1],
-    [7, 4, 2]
-]
-
-# L
-# [[1.         0.         0.        ]
-#  [0.25       1.         0.        ]
-#  [0.875      0.34615385 1.        ]]
-#
-# U
-# [[ 8.          2.          1.        ]
-#  [ 0.          6.5        -6.25      ]
-#  [ 0.          0.          3.28846154]]
-#
-# P
-# [[0. 1. 0.]
-#  [1. 0. 0.]
-#  [0. 0. 1.]]
-
-
-current_example = np.array(exp1)
-
-mat = Matrix(3, 3, current_example)
-print(mat.LUP())
+        return str(self._matrix)

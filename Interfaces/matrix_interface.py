@@ -33,5 +33,5 @@ class IMatrix(ABC):
         pass
 
     @abstractmethod
-    def _update_dimensions(self, rows: int, columns: int) -> None:
+    def _update_dimensions(self) -> None:
         pass

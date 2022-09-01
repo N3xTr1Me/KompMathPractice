@@ -1,7 +1,7 @@
-import numpy as np
-
 from Data.matrices.matrix import Matrix
 from Data.domain import Domain
+
+import numpy as np
 
 
 class MassMatrix(Matrix):
@@ -37,4 +37,4 @@ class MassMatrix(Matrix):
                 matrix.merge(row.get_data())
 
         self._matrix = matrix.get_data()
-        self._update_dimensions(self._source.rows() * 2, self._source.columns() * 2)
+        self._update_dimensions()
