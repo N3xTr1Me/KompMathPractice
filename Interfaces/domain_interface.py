@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+
+from Data.basis import Basis
 
 from numpy import array
 
@@ -15,11 +16,11 @@ class IDomain(ABC):
         pass
 
     @abstractmethod
-    def _generate_nodes(self) -> list:
+    def _generate_nodes(self, heat_source: callable) -> list:
         pass
 
     @abstractmethod
-    def _map_mesh(self, basis: Dict[str, callable]) -> list:
+    def _map_mesh(self, basis: Basis) -> list:
         pass
 
     @abstractmethod

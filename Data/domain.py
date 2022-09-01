@@ -1,17 +1,15 @@
+from Data.basis import Basis
 from Data.border import Border
 from Data.node import Node
 from Data.rectangle import Rectangle
 
 from Interfaces.domain_interface import IDomain
 
-from typing import List, Dict
-import random
-
 
 # A flyweight class, containing all the data defining the 2D region, which thermal conditions are to be found
 class Domain(IDomain):
-    def __init__(self, width: int, height: int, basis: Dict[str, callable],
-                 heat_source: List[float] = None):
+    def __init__(self, width: int, height: int, basis: Basis,
+                 heat_source: callable):
 
         # Initial field dimensions
         self.__width = width
@@ -19,10 +17,9 @@ class Domain(IDomain):
 
         # Field border and thermal source
         self.__area = Border(Node(0, 0), Node(self.get_width() - 1, self.get_height() - 1))
-        self.__heat_source = heat_source
 
         # Table of nodes on the field
-        self.__grid = self._generate_nodes()
+        self.__grid = self._generate_nodes(heat_source)
         # Table of finite elements, built on the field nodes
         self.__mesh = self._map_mesh(basis)
 
@@ -41,7 +38,7 @@ class Domain(IDomain):
         return self.get_width() - 3
 
     # Fills the field with nodes
-    def _generate_nodes(self) -> list:
+    def _generate_nodes(self, heat_source: callable) -> list:
         n, m = self.get_height(), self.get_width()
 
         grid = [[None for _ in range(m)] for _ in range(n)]
@@ -49,7 +46,7 @@ class Domain(IDomain):
         for i in range(n):
             for j in range(m):
                 if self.__area.within(j, i):
-                    t = random.randint(1, 10)
+                    t = heat_source()
                 else:
                     t = 0
 
@@ -58,7 +55,7 @@ class Domain(IDomain):
         return grid
 
     # Constructs the rectangular finite elements from the nodes on the field
-    def _map_mesh(self, basis: Dict[str, callable]) -> list:
+    def _map_mesh(self, basis: Basis) -> list:
         rows, columns = self.rows(), self.columns()
 
         mesh = [[] for _ in range(rows)]
@@ -66,7 +63,7 @@ class Domain(IDomain):
         for i in range(0, rows):
             for j in range(0, columns):
                 mesh[i].append(Rectangle(self.__grid[i + 1][j + 1], self.__grid[i + 2][j + 1],
-                                         self.__grid[i + 2][j + 2], self.__grid[i + 1][j + 2], basis_funcs=basis))
+                                         self.__grid[i + 2][j + 2], self.__grid[i + 1][j + 2], basis))
 
         return mesh
 
