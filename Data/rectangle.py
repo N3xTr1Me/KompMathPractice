@@ -24,19 +24,19 @@ class Rectangle(IFinite):
     # ------------------------------------------------------------------------------------------------------------------
 
     def basis(self, function: str, dot: Node, w: int, h: int) -> callable:
-        return self._basis(function, dot, w, h)
+        return self._basis(function, (dot.x(), dot.y()), w, h)
 
     def phi_1(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.phi_1(dot, w, h)
+        return self._basis.phi_1(dot.x(), dot.y(), w, h)
 
     def phi_2(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.phi_2(dot, w, h)
+        return self._basis.phi_2(dot.x(), dot.y(), w, h)
 
     def d_phi_1(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.d_phi_1(dot, w, h)
+        return self._basis.d_phi_1(dot.x(), dot.y(), w, h)
 
     def d_phi_2(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.d_phi_2(dot, w, h)
+        return self._basis.d_phi_2(dot.x(), dot.y(), w, h)
 
     # returns the local mass matrix of the current finite element
     def mass(self, w: int, h: int) -> numpy.array:
