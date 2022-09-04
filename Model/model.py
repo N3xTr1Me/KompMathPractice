@@ -3,7 +3,7 @@ from typing import Tuple
 from Data.basis import Basis
 from Model.fem import FEM
 
-from Model.time_frame import Frame
+from Model.frame import Frame
 
 
 class Model:

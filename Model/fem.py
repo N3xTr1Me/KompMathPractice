@@ -8,7 +8,7 @@ from Data.matrices.stiffness_matrix import StiffnessMatrix
 
 from Data.basis import Basis
 from Data.domain import Domain
-from Model.time_frame import Frame
+from Model.frame import Frame
 
 import numpy as np
 
