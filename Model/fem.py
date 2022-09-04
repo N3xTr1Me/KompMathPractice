@@ -15,7 +15,6 @@ import numpy as np
 
 class FEM(IAlgorithm):
     def __init__(self, dimensions: Tuple[int, int], basis: Basis, right_side: callable):
-
         self.__f = right_side
         self.__domain = Domain(dimensions[0], dimensions[1], basis, right_side)
 
@@ -28,10 +27,10 @@ class FEM(IAlgorithm):
         return StiffnessMatrix(self.__domain)
 
     def __build_frame(self, xi: Matrix, t: float) -> Frame:
-        return Frame(t=t,
-                     mass=self.__mass(),
-                     stiffness=self.__stiffness(),
-                     coefficients=xi)
+        return Frame(step=t,
+                     matrices={"mass": self.__mass(),
+                               "stiffness": self.__stiffness(),
+                               "coefficients": xi})
 
     # b_n
     def __b(self) -> Matrix:
@@ -45,7 +44,6 @@ class FEM(IAlgorithm):
 
     # Performs a step of algorithm
     def step(self, t: float, current: Frame, previous: Frame) -> Frame:
-
         M = self.__mass()
         S = self.__stiffness()
         b = self.__b()
