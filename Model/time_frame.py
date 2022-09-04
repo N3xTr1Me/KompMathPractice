@@ -1,28 +1,28 @@
-import numpy as np
-
 from Data.basis import Basis
-from Data.matrices.matrix import Matrix
-from Data.matrices.mass_matrix import MassMatrix
-from Data.matrices.stiffness_matrix import StiffnessMatrix
+
+from typing import Dict
+
+import numpy as np
 
 
 class Frame:
-    def __init__(self, step: float, mass: MassMatrix, stiffness: StiffnessMatrix, coefficients: Matrix):
+    def __init__(self, step: float, matrices: Dict[str, np.array]):
+
         self.__step = step
 
-        self.__xi = coefficients
-        self.__m = mass
-        self.__s = stiffness
+        self.__xi = matrices["xi"]
+        self.__m = matrices["mass"]
+        self.__s = matrices["stiffness"]
 
         self.__temps = None
 
-    def M(self) -> MassMatrix:
+    def M(self) -> np.array:
         return self.__m
 
-    def S(self) -> StiffnessMatrix:
+    def S(self) -> np.array:
         return self.__s
 
-    def Xi(self) -> Matrix:
+    def Xi(self) -> np.array:
         return self.__xi
 
     def t(self) -> float:
@@ -36,20 +36,20 @@ class Frame:
         for i in range(h - 1):
             for j in range(w - 1):
                 # lower-left
-                result[i][j] = self.calculate_t(basis, "lower-left", j, i)
+                result[i][j] = self.__calculate_t(basis, "lower-left", j, i)
 
                 # upper-left
-                result[i + 1][j] = self.calculate_t(basis, "upper-left", j, i + 1)
+                result[i + 1][j] = self.__calculate_t(basis, "upper-left", j, i + 1)
 
                 # upper-right
-                result[i + 1][j + 1] = self.calculate_t(basis, "upper-right", j + 1, i + 1)
+                result[i + 1][j + 1] = self.__calculate_t(basis, "upper-right", j + 1, i + 1)
 
                 # lower-right
-                result[i][j + 1] = self.calculate_t(basis, "lower-right", j + 1, i)
+                result[i][j + 1] = self.__calculate_t(basis, "lower-right", j + 1, i)
 
-        self.__temps = Matrix(h, w, result)
+        self.__temps = result
 
-    def calculate_t(self, basis: Basis, position: str, x: int, y: int):
+    def __calculate_t(self, basis: Basis, position: str, x: int, y: int) -> float:
         if position == "upper-left":
             return basis.phi_1(x, y, self.__xi.columns(), self.__xi.rows()) * \
                    basis.phi_1(x, y, self.__xi.columns(), self.__xi.rows()) * self.__xi(y, x)
@@ -66,7 +66,7 @@ class Frame:
         return self.__temps
 
     def __str__(self):
-        result = f"Step # {self.__step}\n"
+        result = f"Step № {self.__step}\n"
         if self.__temps is not None:
             result += str(self.__temps) + "\n"
 
@@ -79,10 +79,10 @@ class Frame:
         cache["step"] = self.__step
 
         if self.__temps is not None:
-            cache["mesh"] = self.__temps.get_data().tolist()
+            cache["mesh"] = self.__temps.tolist()
 
-        cache["xi"] = self.__xi.get_data().tolist()
-        cache["mass"] = self.__m.get_data().tolist()
-        cache["stiffness"] = self.__s.get_data().tolist()
+        cache["xi"] = self.__xi.tolist()
+        cache["mass"] = self.__m.tolist()
+        cache["stiffness"] = self.__s.tolist()
 
         return cache
