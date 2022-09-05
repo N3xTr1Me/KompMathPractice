@@ -43,19 +43,23 @@ class FEM(IAlgorithm):
         return current.t() - t
 
     # Performs a step of algorithm
-    def step(self, t: float, current: Frame, previous: Frame) -> Frame:
+    def step(self, t: float, current: Frame, previous: Frame = None) -> Frame:
+
         M = self.__mass()
         S = self.__stiffness()
         b = self.__b()
-        k = self.__k(current, previous.t())
+
+        if previous is not None:
+            k = self.__k(current, previous.t())
+            right_side = previous.M() * previous.Xi() + b
+        else:
+            k = self.__k(current, 0)
+            rigt_side = 0
 
         left_side = M + S * k  # Xi needed here
-        right_side = previous.M() * previous.Xi() + b
 
         # calculations and LUP decomposition and got result_xi
         result_xi = Matrix(self.__domain.rows(), self.__domain.columns())
-
-        # update the temperature values on the field
 
         next_step = self.__build_frame(xi=result_xi, t=current.t() + t)
 
