@@ -10,16 +10,19 @@ import json
 
 # A json-oriented file handler class
 class Storage(IStorage):
-    def __init__(self):
+    def __init__(self, config_path: str, storage_path: str, config: dict = None):
         # Path to default configurations file
-        self.__config = "../Config/config.json"
+        self.__config = config_path
 
         # Path to the default storage directory
-        self.__storage = "../Cache/data/"
+        self.__storage = storage_path
 
         # Default configuration
-        self.__options = {"mode": None,
-                          "step_by_step": False}
+        if config is None:
+            config = {"mode": None,
+                      "step_by_step": False}
+
+        self.__options = config
 
     # helper method to generate path to stored data location
     def __data_path(self, session: str) -> str:
