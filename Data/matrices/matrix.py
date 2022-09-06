@@ -4,6 +4,7 @@ from Interfaces.decomposition import IDecomposition
 from typing import Dict
 from copy import deepcopy
 import numpy as np
+from numpy.linalg import inv
 
 
 # Matrix wrapper class for calculations
@@ -155,6 +156,11 @@ class Matrix(IMatrix, IDecomposition):
                     L[i][i] = 1
 
         return {"L": L, "U": U, "P": P}
+
+    def ksi_n(self, M_n_1, ksi_n_1, b_n, M_n, k_n, S_n):
+        first_multiplier = inv(np.array(M_n + k_n * S_n))
+        second_multiplier = (M_n_1 * ksi_n_1 + b_n)
+        return first_multiplier * second_multiplier
 
     # ------------------------------------------------------------------------------------------------------------------
     #                                        object functions overriding
