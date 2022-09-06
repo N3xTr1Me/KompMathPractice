@@ -4,6 +4,7 @@ from Interfaces.decomposition import IDecomposition
 from typing import Dict
 from copy import deepcopy
 import numpy as np
+from numpy.linalg import inv
 
 
 # Matrix wrapper class for calculations
@@ -161,25 +162,63 @@ class Matrix(IMatrix, IDecomposition):
     # ------------------------------------------------------------------------------------------------------------------
 
     def __add__(self, other):
-        if self.rows() == other.rows() and self.columns() == other.columns():
 
-            new_matrix = self.get_data() + other.get_data()
+        if isinstance(other, Matrix):
+            data = other.get_data()
+        elif isinstance(other, np.ndarray):
+            data = other
+        else:
+            raise TypeError(f"Incompatible type: {type(other)}!")
+
+        if self.__check(data):
+
+            new_matrix = self.get_data() + data
             return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
 
         else:
             raise ValueError(f"Matrices' dimensions don't match: {self.rows(), self.columns()} / "
-                             f"{other.rows(), other.columns()}!")
+                             f"{other.shape[0], other.shape[1]}!")
 
     def __mul__(self, other):
-        # TODO: add multiplication by number
+        if isinstance(other, Matrix):
 
-        if self.columns() == other.rows():
-            new_matrix = np.dot(self.get_data(), other.get_data())
-            return Matrix(rows=self.rows(), columns=other.columns(), data=new_matrix)
+            if self.columns() == other.rows():
+                new_matrix = np.dot(self.get_data(), other.get_data())
+                return Matrix(rows=self.rows(), columns=other.columns(), data=new_matrix)
+
+            else:
+                raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
+                                 f"{other.rows(), other.columns()}!")
+
+        elif isinstance(other, int) or isinstance(other, float):
+            new_matrix = np.multiply(self.get_data(), other)
+            return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
 
         else:
-            raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
-                             f"{other.rows(), other.columns()}!")
+            if self.__check(other):
+                new_matrix = np.dot(self.get_data(), other)
+                return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
+            else:
+                raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
+                                 f"{other.shape[0], other.shape[1]}!")
+
+    def __sub__(self, other):
+
+        if isinstance(other, Matrix):
+            data = other.get_data()
+        elif isinstance(other, np.ndarray):
+            data = other
+        else:
+            raise TypeError(f"Incompatible type: {type(other)}!")
+
+        if self.__check(data):
+
+            new_matrix = self.get_data() - data
+            return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
+
+        else:
+            raise ValueError(f"Matrices' dimensions don't match: {self.rows(), self.columns()} / "
+                             f"{other.shape[0], other.shape[1]}!")
 
     # allows calling matrix objects by indexes
     def __call__(self, row: int, column: int):
