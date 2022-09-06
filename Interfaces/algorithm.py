@@ -26,9 +26,9 @@ class IAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def __build_frame(self, xi: Matrix, t: float) -> Frame:
+    def __build_frame(self, xi: Matrix, t: float, mass: MassMatrix, stiff: StiffnessMatrix) -> Frame:
         pass
 
     @abstractmethod
-    def step(self, t: float, current: Frame, previous: Frame) -> Frame:
+    def step(self, t: float, previous: Frame) -> Frame:
         pass

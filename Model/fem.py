@@ -1,5 +1,7 @@
 from typing import Tuple
 
+from numpy.linalg import inv
+
 from Interfaces.algorithm import IAlgorithm
 
 from Data.matrices.matrix import Matrix
@@ -15,7 +17,6 @@ import numpy as np
 
 class FEM(IAlgorithm):
     def __init__(self, dimensions: Tuple[int, int], basis: Basis, right_side: callable):
-        self.__f = right_side
         self.__domain = Domain(dimensions[0], dimensions[1], basis, right_side)
 
     # Mass matrix
@@ -26,10 +27,10 @@ class FEM(IAlgorithm):
     def __stiffness(self) -> StiffnessMatrix:
         return StiffnessMatrix(self.__domain)
 
-    def __build_frame(self, xi: Matrix, t: float) -> Frame:
+    def __build_frame(self, xi: Matrix, t: float, mass: MassMatrix, stiff: StiffnessMatrix) -> Frame:
         return Frame(step=t,
-                     matrices={"mass": self.__mass(),
-                               "stiffness": self.__stiffness(),
+                     matrices={"mass": mass,
+                               "stiffness": stiff,
                                "coefficients": xi})
 
     # b_n
@@ -42,25 +43,30 @@ class FEM(IAlgorithm):
     def __k(self, current: Frame, t: float) -> float:
         return current.t() - t
 
+    def ksi_n(self, left_side: Matrix, right_side: Matrix):
+
+        first_multiplier = inv(left_side.get_data())
+        return first_multiplier * right_side
+
     # Performs a step of algorithm
-    def step(self, t: float, current: Frame, previous: Frame = None) -> Frame:
+    def step(self, t: float, previous: Frame = None) -> Frame:
 
         M = self.__mass()
         S = self.__stiffness()
         b = self.__b()
 
         if previous is not None:
-            k = self.__k(current, previous.t())
+            k = t
             right_side = previous.M() * previous.Xi() + b
         else:
-            k = self.__k(current, 0)
-            rigt_side = 0
+            k = 0
+            rigt_side = Matrix(self.__domain.rows(), self.__domain.columns(),
+                               np.zeros((self.__domain.rows(), self.__domain.columns())))
 
-        left_side = M + S * k  # Xi needed here
+        left_side = M + S * k
 
-        # calculations and LUP decomposition and got result_xi
-        result_xi = Matrix(self.__domain.rows(), self.__domain.columns())
+        result_ksi = self.ksi_n(left_side, right_side)
 
-        next_step = self.__build_frame(xi=result_xi, t=current.t() + t)
+        next_step = self.__build_frame(xi=result_ksi, t=previous.t() + t, mass=M, stiff=S)
 
         return next_step

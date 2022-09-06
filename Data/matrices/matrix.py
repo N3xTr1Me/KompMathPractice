@@ -157,11 +157,6 @@ class Matrix(IMatrix, IDecomposition):
 
         return {"L": L, "U": U, "P": P}
 
-    def ksi_n(self, M_n_1, ksi_n_1, b_n, M_n, k_n, S_n):
-        first_multiplier = inv(np.array(M_n + k_n * S_n))
-        second_multiplier = (M_n_1 * ksi_n_1 + b_n)
-        return first_multiplier * second_multiplier
-
     # ------------------------------------------------------------------------------------------------------------------
     #                                        object functions overriding
     # ------------------------------------------------------------------------------------------------------------------
