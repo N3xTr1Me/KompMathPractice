@@ -20,53 +20,57 @@ class FEM(IAlgorithm):
         self.__domain = Domain(dimensions[0], dimensions[1], basis, right_side)
 
     # Mass matrix
-    def __mass(self) -> MassMatrix:
+    def _mass(self) -> MassMatrix:
         return MassMatrix(self.__domain)
 
     # Stiffness matrix
-    def __stiffness(self) -> StiffnessMatrix:
+    def _stiffness(self) -> StiffnessMatrix:
         return StiffnessMatrix(self.__domain)
 
-    def __build_frame(self, xi: Matrix, t: float, mass: MassMatrix, stiff: StiffnessMatrix) -> Frame:
+    def _build_frame(self, xi: Matrix, t: float, mass: MassMatrix, stiff: StiffnessMatrix) -> Frame:
         return Frame(step=t,
-                     matrices={"mass": mass,
-                               "stiffness": stiff,
-                               "coefficients": xi})
+                     matrices={"mass": mass.get_data(),
+                               "stiffness": stiff.get_data(),
+                               "xi": xi.get_data()})
 
     # b_n
-    def __b(self) -> Matrix:
+    def _b(self) -> Matrix:
         # TODO: implement b_n calculation from the guidebook
 
-        return Matrix(self.__domain.rows(), self.__domain.columns(),
-                      np.zeroes(self.__domain.rows(), self.__domain.columns()))
+        return Matrix(self.__domain.rows() * 2, self.__domain.columns() * 2,
+                      np.zeros((self.__domain.rows() * 2, self.__domain.columns() * 2)))
 
-    def __k(self, current: Frame, t: float) -> float:
+    def _k(self, current: Frame, t: float) -> float:
         return current.t() - t
 
     def ksi_n(self, left_side: Matrix, right_side: Matrix):
 
         first_multiplier = inv(left_side.get_data())
-        return first_multiplier * right_side
+        return Matrix(right_side.rows(), right_side.columns(),
+                      data=first_multiplier * right_side.get_data())
 
     # Performs a step of algorithm
     def step(self, t: float, previous: Frame = None) -> Frame:
 
-        M = self.__mass()
-        S = self.__stiffness()
-        b = self.__b()
+        M = self._mass()
+        S = self._stiffness()
+        b = self._b()
 
         if previous is not None:
             k = t
-            right_side = previous.M() * previous.Xi() + b
+            step = previous.t() + t
+            right_side = Matrix(self.__domain.rows() * 2, self.__domain.columns() * 2,
+                                previous.M() * previous.Xi() + b.get_data())
         else:
             k = 0
-            rigt_side = Matrix(self.__domain.rows(), self.__domain.columns(),
-                               np.zeros((self.__domain.rows(), self.__domain.columns())))
+            step = 0
+            right_side = Matrix(self.__domain.rows() * 2, self.__domain.columns() * 2,
+                               np.zeros((self.__domain.rows() * 2, self.__domain.columns() * 2)))
 
         left_side = M + S * k
 
         result_ksi = self.ksi_n(left_side, right_side)
 
-        next_step = self.__build_frame(xi=result_ksi, t=previous.t() + t, mass=M, stiff=S)
+        next_step = self._build_frame(xi=result_ksi, t=step, mass=M, stiff=S)
 
         return next_step

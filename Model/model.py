@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, Any
+from typing import Tuple
 
 from Data.basis import Basis
 from Model.right_side.functor import Functor
@@ -9,6 +9,8 @@ from Model.fem import FEM
 from Model.file_handler import Storage
 
 from Model.frame import Frame
+
+import datetime
 
 
 class Model:
@@ -48,13 +50,13 @@ class Model:
         self.__cached = []
 
     def __current(self) -> Frame:
-        return self.__storage.get_step(self.__session, self.__cached[-1])
+        return self.__storage.get_step(self.__session, self.__previous())
 
-    def __previous(self) -> Any | None:
+    def __previous(self) -> float:
         if self.__cached:
             return self.__cached[-1]
         else:
-            return None
+            return 0
 
     def __start_calculation(self):
         self.__session = self.__storage.start_session()
@@ -72,7 +74,10 @@ class Model:
         if not self.__session:
             self.__start_calculation()
 
-        iteration = self.__solver.step(self.__t, self.__previous())
+        if self.__step == 0:
+            iteration = self.__solver.step(self.__t)
+        else:
+            iteration = self.__solver.step(self.__t, self.__current())
 
         self.__step += self.__t
 
@@ -93,5 +98,10 @@ dims = (10, 10)
 time = 10
 time_step = 1
 
+start_1 = datetime.datetime.now()
 model = Model(T=time, step=time_step, dimensions=dims, right_side=lambda x, y: random.randint(1, 10))
+
+start_2 = datetime.datetime.now()
 model.run_algorithm()
+print(datetime.datetime.now() - start_2)
+print(datetime.datetime.now() - start_1)

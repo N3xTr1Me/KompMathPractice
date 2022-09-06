@@ -10,9 +10,9 @@ class Frame:
 
         self.__step = step
 
-        self.__xi = matrices["xi"]
-        self.__m = matrices["mass"]
-        self.__s = matrices["stiffness"]
+        self.__xi = np.array(matrices["xi"])
+        self.__m = np.array(matrices["mass"])
+        self.__s = np.array(matrices["stiffness"])
 
         self.__temps = None
 
@@ -29,7 +29,7 @@ class Frame:
         return self.__step
 
     def set_temperatures(self, basis: Basis) -> None:
-        h, w = self.__xi.rows(), self.__xi.columns()
+        h, w = self.__xi.shape[0], self.__xi.shape[1]
 
         result = np.zeros((w, h), dtype=float)
 
@@ -51,16 +51,16 @@ class Frame:
 
     def __calculate_t(self, basis: Basis, position: str, x: int, y: int) -> float:
         if position == "upper-left":
-            return basis.phi_1(x, y, self.__xi.columns(), self.__xi.rows()) * \
-                   basis.phi_1(x, y, self.__xi.columns(), self.__xi.rows()) * self.__xi(y, x)
+            return basis.phi_1(x, y, self.__xi.shape[1], self.__xi.shape[0]) * \
+                   basis.phi_1(x, y, self.__xi.shape[1], self.__xi.shape[0]) * self.__xi[y][x]
 
         elif position == "upper-right":
-            return basis.phi_2(x, y, self.__xi.columns(), self.__xi.rows()) * \
-                   basis.phi_2(x, y, self.__xi.columns(), self.__xi.rows()) * self.__xi(y, x)
+            return basis.phi_2(x, y, self.__xi.shape[1], self.__xi.shape[0]) * \
+                   basis.phi_2(x, y, self.__xi.shape[1], self.__xi.shape[0]) * self.__xi[y][x]
 
         else:
-            return basis.phi_1(x, y, self.__xi.columns(), self.__xi.rows()) * \
-                   basis.phi_2(x, y, self.__xi.columns(), self.__xi.rows()) * self.__xi(y, x)
+            return basis.phi_1(x, y, self.__xi.shape[1], self.__xi.shape[0]) * \
+                   basis.phi_2(x, y, self.__xi.shape[1], self.__xi.shape[0]) * self.__xi[y][x]
 
     def get_temperatures(self):
         return self.__temps

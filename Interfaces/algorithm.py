@@ -10,23 +10,23 @@ from Model.frame import Frame
 class IAlgorithm(ABC):
 
     @abstractmethod
-    def __mass(self) -> MassMatrix:
+    def _mass(self) -> MassMatrix:
         pass
 
     @abstractmethod
-    def __stiffness(self) -> StiffnessMatrix:
+    def _stiffness(self) -> StiffnessMatrix:
         pass
 
     @abstractmethod
-    def __b(self) -> Matrix:
+    def _b(self) -> Matrix:
         pass
 
     @abstractmethod
-    def __k(self, current: Frame, t: float) -> float:
+    def _k(self, current: Frame, t: float) -> float:
         pass
 
     @abstractmethod
-    def __build_frame(self, xi: Matrix, t: float, mass: MassMatrix, stiff: StiffnessMatrix) -> Frame:
+    def _build_frame(self, xi: Matrix, t: float, mass: MassMatrix, stiff: StiffnessMatrix) -> Frame:
         pass
 
     @abstractmethod

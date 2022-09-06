@@ -46,7 +46,7 @@ class Domain(IDomain):
         for i in range(n):
             for j in range(m):
                 if self.__area.within(j, i):
-                    t = heat_source()
+                    t = heat_source(j, i)
                 else:
                     t = 0
 
