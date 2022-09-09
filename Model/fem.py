@@ -55,6 +55,9 @@ class FEM(IAlgorithm):
         M = self._mass()
         S = self._stiffness()
         b = self._b()
+        b = Matrix(self.__domain.rows() * 2, self.__domain.columns() * 2,
+                   np.zeros((self.__domain.rows() * 2, self.__domain.columns() * 2)))
+        b.change_value(5, 5, 13)
 
         if previous is not None:
             k = t

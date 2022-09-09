@@ -92,16 +92,3 @@ class Model:
 
         while self.__step < self.__T:
             iteration = self.make_step()
-
-
-dims = (10, 10)
-time = 10
-time_step = 1
-
-start_1 = datetime.datetime.now()
-model = Model(T=time, step=time_step, dimensions=dims, right_side=lambda x, y: random.randint(1, 10))
-
-start_2 = datetime.datetime.now()
-model.run_algorithm()
-print(datetime.datetime.now() - start_2)
-print(datetime.datetime.now() - start_1)
