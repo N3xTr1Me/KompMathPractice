@@ -43,7 +43,7 @@ class FEM(IAlgorithm):
     def _k(self, current: Frame, t: float) -> float:
         return current.t() - t
 
-    def ksi_n(self, left_side: Matrix, right_side: Matrix):
+    def _ksi_n(self, left_side: Matrix, right_side: Matrix) -> Matrix:
 
         first_multiplier = inv(left_side.get_data())
         return Matrix(right_side.rows(), right_side.columns(),
@@ -72,7 +72,7 @@ class FEM(IAlgorithm):
 
         left_side = M + S * k
 
-        result_ksi = self.ksi_n(left_side, right_side)
+        result_ksi = self._ksi_n(left_side, right_side)
 
         next_step = self._build_frame(xi=result_ksi, t=step, mass=M, stiff=S)
 

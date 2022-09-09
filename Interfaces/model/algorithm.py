@@ -26,6 +26,10 @@ class IAlgorithm(ABC):
         pass
 
     @abstractmethod
+    def _ksi_n(self, left_side: Matrix, right_side: Matrix) -> Matrix:
+        pass
+
+    @abstractmethod
     def _build_frame(self, xi: Matrix, t: float, mass: MassMatrix, stiff: StiffnessMatrix) -> Frame:
         pass
 
