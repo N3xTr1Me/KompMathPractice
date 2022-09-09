@@ -1,6 +1,6 @@
 
 
-# a node-dot on the 2D grid. Has (x,y) coordinates, temperature and basis functions
+# a node-dot on the 2D grid. Has (x,y) coordinates and temperature
 class Node:
     def __init__(self, x: float, y: float, t: float = None):
         super(Node, self).__init__()

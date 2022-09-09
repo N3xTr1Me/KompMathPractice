@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from Data.basis import Basis
+from Data.basis.basis import Basis
 
 from numpy import array
 

@@ -1,6 +1,4 @@
-from Interfaces.basis_interface import IBasis
-
-from Data.node import Node
+from Interfaces.mesh.basis_interface import IBasis
 
 from typing import Dict, Tuple
 

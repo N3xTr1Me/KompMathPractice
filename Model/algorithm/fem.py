@@ -2,15 +2,15 @@ from typing import Tuple
 
 from numpy.linalg import inv
 
-from Interfaces.algorithm import IAlgorithm
+from Interfaces.model.algorithm import IAlgorithm
 
 from Data.matrices.matrix import Matrix
 from Data.matrices.mass_matrix import MassMatrix
 from Data.matrices.stiffness_matrix import StiffnessMatrix
 
-from Data.basis import Basis
-from Data.domain import Domain
-from Model.frame import Frame
+from Data.basis.basis import Basis
+from Data.mesh.domain import Domain
+from Model.algorithm.frame import Frame
 
 import numpy as np
 
@@ -43,7 +43,7 @@ class FEM(IAlgorithm):
     def _k(self, current: Frame, t: float) -> float:
         return current.t() - t
 
-    def ksi_n(self, left_side: Matrix, right_side: Matrix):
+    def _ksi_n(self, left_side: Matrix, right_side: Matrix) -> Matrix:
 
         first_multiplier = inv(left_side.get_data())
         return Matrix(right_side.rows(), right_side.columns(),
@@ -72,7 +72,7 @@ class FEM(IAlgorithm):
 
         left_side = M + S * k
 
-        result_ksi = self.ksi_n(left_side, right_side)
+        result_ksi = self._ksi_n(left_side, right_side)
 
         next_step = self._build_frame(xi=result_ksi, t=step, mass=M, stiff=S)
 

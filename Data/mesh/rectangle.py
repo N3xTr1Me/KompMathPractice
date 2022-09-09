@@ -1,7 +1,7 @@
-from Interfaces.finite_element import IFinite
+from Interfaces.mesh.finite_element import IFinite
 
-from Data.basis import Basis
-from Data.node import Node
+from Data.basis.basis import Basis
+from Data.mesh.node import Node
 
 import numpy
 from scipy.integrate import dblquad
@@ -80,24 +80,3 @@ class Rectangle(IFinite):
             0, h, lambda x: 0, lambda x: w)[0]
 
         return result
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-
-# # Testing:
-# basis = Basis({"phi_1": lambda x, y, w, h: (x + w) - (4 * y - h) + 1,
-#                "phi_2": lambda x, y, w, h: (2 * x - w) + (y + h) - 5,
-#                "d_phi_1": lambda x, y, w, h: 1,
-#                "d_phi_2": lambda x, y, w, h: 2
-#                })
-#
-# _first = Node(4, 3)
-# _second = Node(3, 3)
-# _third = Node(3, 4)
-# _fourth = Node(4, 4)
-#
-# rect = Rectangle(_first, _second, _third, _fourth, basis)
-#
-# print(rect.mass(10, 10))
-# print(rect.stiffness(10, 10))

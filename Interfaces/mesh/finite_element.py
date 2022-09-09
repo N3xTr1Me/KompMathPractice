@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from Data.node import Node
+from Data.mesh.node import Node
 
 from numpy import array
 

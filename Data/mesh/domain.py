@@ -1,26 +1,22 @@
-from Data.basis import Basis
-from Data.border import Border
-from Data.node import Node
-from Data.rectangle import Rectangle
+from Data.basis.basis import Basis
+from Data.mesh.node import Node
+from Data.mesh.rectangle import Rectangle
 
-from Interfaces.domain_interface import IDomain
+from Interfaces.mesh.domain_interface import IDomain
 
 
-# A flyweight class, containing all the data defining the 2D region, which thermal conditions are to be found
+# A flyweight class, containing all the sessions defining the 2D region, which thermal conditions are to be found
 class Domain(IDomain):
     def __init__(self, width: int, height: int, basis: Basis,
                  heat_source: callable):
 
-        # Initial field dimensions
+        # Initial mesh dimensions
         self.__width = width
         self.__height = height
 
-        # Field border and thermal source
-        self.__area = Border(Node(0, 0), Node(self.get_width() - 1, self.get_height() - 1))
-
-        # Table of nodes on the field
+        # Table of nodes on the mesh
         self.__grid = self._generate_nodes(heat_source)
-        # Table of finite elements, built on the field nodes
+        # Table of finite elements, built on the mesh nodes
         self.__mesh = self._map_mesh(basis)
 
     def get_height(self) -> int:
@@ -37,7 +33,7 @@ class Domain(IDomain):
     def columns(self) -> int:
         return self.get_width() - 3
 
-    # Fills the field with nodes
+    # Fills the grid on the field with nodes
     def _generate_nodes(self, heat_source: callable) -> list:
         n, m = self.get_height(), self.get_width()
 
@@ -45,16 +41,13 @@ class Domain(IDomain):
 
         for i in range(n):
             for j in range(m):
-                if self.__area.within(j, i):
-                    t = heat_source(j, i)
-                else:
-                    t = 0
+                t = heat_source(j, i)
 
                 grid[i][j] = Node(j, i, t)
 
         return grid
 
-    # Constructs the rectangular finite elements from the nodes on the field
+    # Constructs the rectangular finite elements from the nodes to form mesh
     def _map_mesh(self, basis: Basis) -> list:
         rows, columns = self.rows(), self.columns()
 
