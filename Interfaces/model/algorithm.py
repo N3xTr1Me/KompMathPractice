@@ -4,7 +4,7 @@ from Data.matrices.matrix import Matrix
 from Data.matrices.mass_matrix import MassMatrix
 from Data.matrices.stiffness_matrix import StiffnessMatrix
 
-from Model.frame import Frame
+from Model.algorithm.frame import Frame
 
 
 class IAlgorithm(ABC):

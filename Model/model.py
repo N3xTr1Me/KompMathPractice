@@ -1,16 +1,13 @@
-import random
 from typing import Tuple
 
-from Data.basis import Basis
-from Model.right_side.functor import Functor
-from Model.right_side.table import Table
+from Data.basis.basis import Basis
+from Data.right_side.functor import Functor
+from Data.right_side.table import Table
 
-from Model.fem import FEM
-from Model.file_handler import Storage
+from Model.algorithm.fem import FEM
+from Model.file_handler.storage import Storage
 
-from Model.frame import Frame
-
-import datetime
+from Model.algorithm.frame import Frame
 
 
 class Model:
@@ -25,7 +22,7 @@ class Model:
 
         # --------------------------------------------------------------------------------------------------------------
 
-        cache_path = "../Cache/data/"
+        cache_path = "../Cache/sessions/"
         config_path = "../Config/config.json"
 
         self.__storage = Storage(config_path, cache_path)

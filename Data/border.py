@@ -1,5 +1,5 @@
 from Interfaces.border_interface import IBorder
-from Data.node import Node
+from Data.mesh.node import Node
 
 
 class Border(IBorder):

@@ -2,15 +2,15 @@ from typing import Tuple
 
 from numpy.linalg import inv
 
-from Interfaces.algorithm import IAlgorithm
+from Interfaces.model.algorithm import IAlgorithm
 
 from Data.matrices.matrix import Matrix
 from Data.matrices.mass_matrix import MassMatrix
 from Data.matrices.stiffness_matrix import StiffnessMatrix
 
-from Data.basis import Basis
-from Data.domain import Domain
-from Model.frame import Frame
+from Data.basis.basis import Basis
+from Data.mesh.domain import Domain
+from Model.algorithm.frame import Frame
 
 import numpy as np
 

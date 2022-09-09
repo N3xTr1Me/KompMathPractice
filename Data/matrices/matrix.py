@@ -1,10 +1,9 @@
-from Interfaces.matrix_interface import IMatrix
-from Interfaces.decomposition import IDecomposition
+from Interfaces.matrix.matrix_interface import IMatrix
+from Interfaces.matrix.decomposition import IDecomposition
 
 from typing import Dict
 from copy import deepcopy
 import numpy as np
-from numpy.linalg import inv
 
 
 # Matrix wrapper class for calculations

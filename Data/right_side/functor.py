@@ -1,4 +1,4 @@
-from Interfaces.right_side import IRightSide
+from Interfaces.model.right_side import IRightSide
 
 
 class Functor(IRightSide):

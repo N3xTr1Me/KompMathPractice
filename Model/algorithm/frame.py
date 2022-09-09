@@ -1,4 +1,4 @@
-from Data.basis import Basis
+from Data.basis.basis import Basis
 
 from typing import Dict
 

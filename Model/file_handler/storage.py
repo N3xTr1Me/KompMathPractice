@@ -1,5 +1,5 @@
-from Interfaces.file_handler import IStorage
-from Model.frame import Frame
+from Interfaces.model.storage_interface import IStorage
+from Model.algorithm.frame import Frame
 
 import os
 import errno
@@ -24,7 +24,7 @@ class Storage(IStorage):
 
         self.__options = config
 
-    # helper method to generate path to stored data location
+    # helper method to generate path to stored sessions location
     def __data_path(self, session: str) -> str:
         return self.__storage + session + "/"
 
@@ -37,7 +37,7 @@ class Storage(IStorage):
     def check_dir(path: str) -> bool:
         return os.path.exists(os.path.dirname(path))
 
-    # helper method to check if the given data is compatible with json
+    # helper method to check if the given sessions is compatible with json
     @staticmethod
     def check_data(data) -> bool:
         try:

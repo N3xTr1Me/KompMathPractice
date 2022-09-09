@@ -1,5 +1,5 @@
 from Data.matrices.matrix import Matrix
-from Data.domain import Domain
+from Data.mesh.domain import Domain
 
 import numpy as np
 

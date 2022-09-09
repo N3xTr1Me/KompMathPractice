@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from Model.frame import Frame
+from Model.algorithm.frame import Frame
 
 
 class IStorage(ABC):
