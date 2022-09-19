@@ -22,8 +22,8 @@ class Model:
 
         # --------------------------------------------------------------------------------------------------------------
 
-        cache_path = "../Cache/sessions/"
-        config_path = "../Config/config.json"
+        cache_path = "./Cache/sessions/"
+        config_path = "./Config/config.json"
 
         self.__storage = Storage(config_path, cache_path)
         self.__config = self.__storage.get_config()

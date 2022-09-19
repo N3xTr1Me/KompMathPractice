@@ -13,6 +13,6 @@ steps_count = int(time / time_step)
 model = Model(T=time, step=time_step, dimensions=dims, right_side=lambda x, y: random.randint(1, 10))
 model.run_algorithm()
 
-# graphics = Graphics(steps_count, time_step, model)
-# graphics.draw()
+graphics = Graphics(steps_count, time_step, model)
+graphics.draw()
 

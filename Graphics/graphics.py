@@ -12,5 +12,5 @@ class Graphics:
 
     def draw(self):
         for current_step in range(self.steps_count):
-            a = self.model.get(current_step * self.time_step)
+            a = self.model.get(current_step * self.time_step if current_step * self.time_step != 0 else 0)
             print(a)
