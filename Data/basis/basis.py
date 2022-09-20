@@ -9,8 +9,10 @@ from typing import Dict, Tuple
 class Basis(IBasis):
     def __init__(self, j: Tuple[float, float], k: Tuple[float, float]):
 
-        self.__nodal = Phi(self._get_constants(j, k))
-        self.__derivative = DPhi(self._get_constants(j, k))
+        constants = self._get_constants(j, k)
+
+        self.__nodal = Phi(constants)
+        self.__derivative = DPhi(constants)
 
     def _get_constants(self, j: Tuple[float, float], k: Tuple[float, float]) -> Dict[str, float]:
         constants = dict()
@@ -20,6 +22,15 @@ class Basis(IBasis):
         constants["c"] = k[0] - j[0]
 
         return constants
+
+    def get_a(self) -> float:
+        return self.__nodal.a()
+
+    def get_b(self) -> float:
+        return self.__nodal.b()
+
+    def get_c(self) -> float:
+        return self.__nodal.c()
 
     def phi(self, x: float, y: float) -> float:
         return self.__nodal(x, y)
