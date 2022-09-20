@@ -1,82 +1,166 @@
 from Interfaces.mesh.finite_element import IFinite
 
-from Data.basis.basis import Basis
 from Data.mesh.node import Node
 
-import numpy
-from scipy.integrate import dblquad
+from typing import Dict
+import numpy as np
 
 
+# A rectangular finite element on a 2D grid.
 class Rectangle(IFinite):
-    def __init__(self, first: Node, second: Node, third: Node, fourth: Node, basis: Basis):
+    def __init__(self, nodes: Dict[str, Node], f: callable):
         super(Rectangle, self).__init__()
 
-        # Rectangle vertexes are initialized clockwise starting from the lower_left
-        self.__lower_left = first
-        self.__lower_right = fourth
+        # checking the minimal requirements
+        vertexes = ["lower-left", "upper-left", "upper-right", "lower-right"]
 
-        self.__upper_left = second
-        self.__upper_right = third
+        for vertex in vertexes:
+            if vertex not in nodes:
+                raise ValueError(f"{vertex} not found among nodes!")
 
-        # initializing element's basis
-        self._basis = basis
+        # checking if the form is correct
+        if nodes["lower-left"].x() == nodes["upper-left"].x() or \
+                nodes["upper-left"].y() == nodes["upper-right"].y() or \
+                nodes["upper-right"].x() == nodes["lower-right"].y() or \
+                nodes["lower-right"].y() == nodes["lower-left"].y():
+
+            # initializing nodes
+            self.__nodes = nodes
+
+            # initializing nodal values
+            self._set_values(f)
+
+        else:
+            raise ValueError("Cannot build a rectangle with given nodes!")
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def basis(self, function: str, dot: Node, w: int, h: int) -> callable:
-        return self._basis(function, (dot.x(), dot.y()), w, h)
+    # Sets nodal values for nodes
+    def _set_values(self, f: callable) -> None:
 
-    def phi_1(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.phi_1(dot.x(), dot.y(), w, h)
+        for node in self.__nodes:
+            x, y = self.__nodes[node].coords()
+            self.__nodes[node].set_u(f(x, y))
 
-    def phi_2(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.phi_2(dot.x(), dot.y(), w, h)
+    # ------------------------------------------------------------------------------------------------------------------
 
-    def d_phi_1(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.d_phi_1(dot.x(), dot.y(), w, h)
+    def lower_left(self) -> Node:
+        return self.__nodes["lower-left"]
 
-    def d_phi_2(self, dot: Node, w: int, h: int) -> float:
-        return self._basis.d_phi_2(dot.x(), dot.y(), w, h)
+    def lower_right(self) -> Node:
+        return self.__nodes["lower-right"]
 
-    # returns the local mass matrix of the current finite element
-    def mass(self, w: int, h: int) -> numpy.array:
-        result = numpy.zeros((2, 2), dtype=float)
+    def upper_left(self) -> Node:
+        return self.__nodes["upper-left"]
 
-        result[0][0] = dblquad(
-            lambda x, y: self.phi_1(dot=self.__upper_left, w=x, h=y) * self.phi_1(dot=self.__upper_left, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
+    def upper_right(self) -> Node:
+        return self.__nodes["upper_right"]
 
-        result[0][1] = dblquad(
-            lambda x, y: self.phi_1(dot=self.__upper_right, w=x, h=y) * self.phi_2(dot=self.__upper_right, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
+    # ------------------------------------------------------------------------------------------------------------------
 
-        result[1][0] = dblquad(
-            lambda x, y: self.phi_2(dot=self.__lower_left, w=x, h=y) * self.phi_1(dot=self.__lower_left, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
+    # Returns the local elemental mass matrix
+    def mass(self) -> np.array:
+        mass_matrix = np.zeros((2, 2), dtype=float)
 
-        result[1][1] = dblquad(
-            lambda x, y: self.phi_2(dot=self.__lower_right, w=x, h=y) * self.phi_2(dot=self.__lower_right, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
-        return result
+        x, y = self.lower_left().coords()
+        mass_matrix[0][0] = self.lower_right().phi(x, y) * self.upper_left().phi(x, y)
 
-    # returns the local stiffness matrix of the current finite element
-    def stiffness(self, w: int, h: int) -> numpy.array:
-        result = numpy.zeros((2, 2), dtype=float)
+        x, y = self.upper_left().coords()
+        mass_matrix[0][0] = self.lower_left().phi(x, y) * self.upper_right().phi(x, y)
 
-        result[0][0] = dblquad(
-            lambda x, y: self.d_phi_1(self.__upper_left, w=x, h=y) * self.d_phi_1(self.__upper_left, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
+        x, y = self.upper_right().coords()
+        mass_matrix[0][0] = self.upper_left().phi(x, y) * self.lower_right().phi(x, y)
 
-        result[0][1] = dblquad(
-            lambda x, y: self.d_phi_1(self.__upper_right, w=x, h=y) * self.d_phi_2(self.__upper_right, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
+        x, y = self.lower_right().coords()
+        mass_matrix[0][0] = self.upper_right().phi(x, y) * self.lower_left().phi(x, y)
 
-        result[1][0] = dblquad(
-            lambda x, y: self.d_phi_2(self.__lower_left, w=x, h=y) * self.d_phi_1(self.__lower_left, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
+        return mass_matrix
 
-        result[1][1] = dblquad(
-            lambda x, y: self.d_phi_2(self.__lower_right, w=x, h=y) * self.d_phi_2(self.__lower_right, w=x, h=y),
-            0, h, lambda x: 0, lambda x: w)[0]
+    # Returns the local elemental stiffness matrix
+    def stiffness(self) -> np.array:
+        stiffness_matrix = np.zeros((2, 2), dtype=float)
 
-        return result
+        x, y = self.lower_left().coords()
+        stiffness_matrix[0][0] = self.lower_right().d_phi(x, y) * self.upper_left().d_phi(x, y)
+
+        x, y = self.upper_left().coords()
+        stiffness_matrix[0][0] = self.lower_left().d_phi(x, y) * self.upper_right().d_phi(x, y)
+
+        x, y = self.upper_right().coords()
+        stiffness_matrix[0][0] = self.upper_left().d_phi(x, y) * self.lower_right().d_phi(x, y)
+
+        x, y = self.lower_right().coords()
+        stiffness_matrix[0][0] = self.upper_right().d_phi(x, y) * self.lower_left().d_phi(x, y)
+
+        return stiffness_matrix
+
+    # def area(self) -> float:
+    #     return (self.upper_right().x() - self.lower_left().x()) * (self.upper_right().y() - self.lower_left().y())
+    #
+    # def form(self) -> Form:
+    #     basis = dict()
+    #
+    #     for node in self.__nodes:
+    #         basis[node] = self.__nodes[node].basis().get_nodal()
+    #
+    #     return Form(basis, self.area())
+    #
+    # def b_matrix(self) -> Matrix:
+    #     rows, columns = 4, 4
+    #
+    #     vertexes = {0: "lower-left",
+    #                 1: "upper-left",
+    #                 2: "upper-right",
+    #                 3: "lower-right"}
+    #
+    #     b = np.zeros((4, 4), dtype=float)
+    #
+    #     for i in range(rows):
+    #         for j in range(columns):
+    #             b[i][j] = self.__nodes[vertexes[i % 3]].b() * self.__nodes[vertexes[j % 3]].b()
+    #
+    #     return Matrix(rows, columns, b)
+    #
+    # def c_matrix(self) -> Matrix:
+    #     rows, columns = 4, 4
+    #
+    #     vertexes = {0: "lower-left",
+    #                 1: "upper-left",
+    #                 2: "upper-right",
+    #                 3: "lower-right"}
+    #
+    #     b = np.zeros((4, 4), dtype=float)
+    #
+    #     for i in range(rows):
+    #         for j in range(columns):
+    #             b[i][j] = self.__nodes[vertexes[i % 3]].c() * self.__nodes[vertexes[j % 3]].c()
+    #
+    #     return Matrix(rows, columns, b)
+
+    # def k_1(self, x_conductivity, y_conductivity) -> Matrix:
+    #     b = x_conductivity / (4 * self.area())
+    #     c = y_conductivity / (4 * self.area())
+    #
+    #     return self.b_matrix() * b + self.c_matrix() * c
+    #
+    # def gradient(self) -> np.array:
+    #     rows = 2
+    #     columns = 4
+    #
+    #     gradient = np.zeros((rows, columns))
+    #     i = 0
+    #
+    #     for node in self.__nodes:
+    #         gradient[i][0] = self.__nodes[node].b()
+    #         gradient[i][1] = self.__nodes[node].c()
+    #
+    #     return gradient
+
+    # @staticmethod
+    # def _property(x_conduct, y_conduct):
+    #     prop = np.zeros((2, 2), dtype=float)
+    #
+    #     prop[0][0] = x_conduct
+    #     prop[1][1] = y_conduct
+    #
+    #     return prop

@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from Data.mesh.node import Node
-
 from numpy import array
 
 
@@ -9,29 +7,13 @@ from numpy import array
 class IFinite(ABC):
 
     @abstractmethod
-    def mass(self, w: int, h: int) -> array:
+    def _set_values(self, f: callable) -> None:
         pass
 
     @abstractmethod
-    def stiffness(self, w: int, h: int) -> array:
+    def mass(self) -> array:
         pass
 
     @abstractmethod
-    def basis(self, function: str, dot: Node, w: int, h: int) -> float:
-        pass
-
-    @abstractmethod
-    def phi_1(self, dot: Node, w: int, h: int) -> float:
-        pass
-
-    @abstractmethod
-    def phi_2(self, dot: Node, w: int, h: int) -> float:
-        pass
-
-    @abstractmethod
-    def d_phi_1(self, dot: Node, w: int, h: int) -> float:
-        pass
-
-    @abstractmethod
-    def d_phi_2(self, dot: Node, w: int, h: int) -> float:
+    def stiffness(self) -> array:
         pass
