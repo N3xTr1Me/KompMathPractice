@@ -23,6 +23,12 @@ class Basis(IBasis):
 
         return constants
 
+    def phi(self) -> Phi:
+        return self.__nodal
+
+    def d_phi(self) -> DPhi:
+        return self.__derivative
+
     def get_a(self) -> float:
         return self.__nodal.a()
 
@@ -32,17 +38,23 @@ class Basis(IBasis):
     def get_c(self) -> float:
         return self.__nodal.c()
 
-    def phi(self, x: float, y: float) -> float:
+    def f(self, x: float, y: float) -> float:
         return self.__nodal(x, y)
 
-    def d_phi(self, x: float, y: float) -> float:
+    def df(self, x: float, y: float) -> float:
         return self.__derivative(x, y)
 
-    def __call__(self, x: float, y: float, derivative: bool = False) -> float:
+    def __call__(self, x: float = None, y: float = None, derivative: bool = False) -> float | callable:
         if derivative:
-            return self.d_phi(x, y)
+            if x is not None and y is not None:
+                return self.df(x, y)
 
-        return self.phi(x, y)
+            return self.d_phi()
+
+        if x is not None and y is not None:
+            return self.f(x, y)
+
+        return self.phi()
 
     def __str__(self):
         string = "basis [\n"
