@@ -1,9 +1,7 @@
-import random
 from typing import Dict
 
 import numpy as np
 
-from Data.basis.basis import Basis
 from Data.mesh.node import Node
 from Data.mesh.rectangle import Rectangle
 
