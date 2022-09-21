@@ -17,7 +17,7 @@ import numpy as np
 
 class FEM(IAlgorithm):
     def __init__(self, dimensions: Tuple[int, int], basis: Basis, right_side: callable):
-        self.__domain = Domain(dimensions[0], dimensions[1], basis, right_side)
+        self.__domain = Domain(dimensions[0], dimensions[1], right_side)
 
     # Mass matrix
     def _mass(self) -> MassMatrix:
@@ -68,7 +68,7 @@ class FEM(IAlgorithm):
             k = 0
             step = 0
             right_side = Matrix(self.__domain.rows() * 2, self.__domain.columns() * 2,
-                               np.zeros((self.__domain.rows() * 2, self.__domain.columns() * 2)))
+                                np.zeros((self.__domain.rows() * 2, self.__domain.columns() * 2)))
 
         left_side = M + S * k
 

@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from Data.basis.basis import Basis
-
 from numpy import array
 
 
@@ -16,17 +14,21 @@ class IDomain(ABC):
         pass
 
     @abstractmethod
-    def _generate_nodes(self, heat_source: callable) -> list:
+    def _generate_nodes(self) -> list:
         pass
 
     @abstractmethod
-    def _map_mesh(self, basis: Basis) -> list:
+    def _map_mesh(self, heat_source: callable) -> list:
         pass
 
     @abstractmethod
-    def get_mass(self, row: int, column: int) -> array:
+    def get_mass(self) -> array:
         pass
 
     @abstractmethod
-    def get_stiffness(self, row: int, column: int) -> array:
+    def get_stiffness(self) -> array:
+        pass
+
+    @abstractmethod
+    def update_u(self, row: int, column: int, value: float):
         pass
