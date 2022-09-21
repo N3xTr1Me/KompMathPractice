@@ -102,6 +102,16 @@ class Rectangle(IFinite):
 
         return stiffness_matrix
 
+    def __repr__(self):
+        string = "|"
+
+        for node in self.__nodes:
+            string += str(self.__nodes[node])
+
+        string += "|"
+
+        return string
+
     # def area(self) -> float:
     #     return (self.upper_right().x() - self.lower_left().x()) * (self.upper_right().y() - self.lower_left().y())
     #
@@ -183,6 +193,6 @@ class Rectangle(IFinite):
 #          "upper-right": ur,
 #          "lower-right": lr}
 #
-# rect = Rectangle(nodes, lambda x, y: random.randint(1, 10))
+# rect = Rectangle(nodes, lambda x, y: 1)
 # print(rect.mass())
 # print(rect.stiffness())
