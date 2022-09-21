@@ -10,5 +10,5 @@ class StiffnessMatrix(MassMatrix):
 
         self._fill()
 
-    def _get_from_src(self, row: int, index: int) -> np.array:
+    def _get_from_src(self) -> np.array:
         return self._source.get_stiffness()
