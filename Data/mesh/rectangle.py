@@ -1,3 +1,5 @@
+import random
+
 from Interfaces.mesh.finite_element import IFinite
 
 from Data.mesh.node import Node
@@ -66,13 +68,13 @@ class Rectangle(IFinite):
         mass_matrix[0][0] = self.lower_right().phi(x, y) * self.upper_left().phi(x, y)
 
         x, y = self.upper_left().coords()
-        mass_matrix[0][0] = self.lower_left().phi(x, y) * self.upper_right().phi(x, y)
+        mass_matrix[0][1] = self.lower_left().phi(x, y) * self.upper_right().phi(x, y)
 
         x, y = self.upper_right().coords()
-        mass_matrix[0][0] = self.upper_left().phi(x, y) * self.lower_right().phi(x, y)
+        mass_matrix[1][1] = self.upper_left().phi(x, y) * self.lower_right().phi(x, y)
 
         x, y = self.lower_right().coords()
-        mass_matrix[0][0] = self.upper_right().phi(x, y) * self.lower_left().phi(x, y)
+        mass_matrix[1][0] = self.upper_right().phi(x, y) * self.lower_left().phi(x, y)
 
         return mass_matrix
 
@@ -84,13 +86,13 @@ class Rectangle(IFinite):
         stiffness_matrix[0][0] = self.lower_right().d_phi(x, y) * self.upper_left().d_phi(x, y)
 
         x, y = self.upper_left().coords()
-        stiffness_matrix[0][0] = self.lower_left().d_phi(x, y) * self.upper_right().d_phi(x, y)
+        stiffness_matrix[0][1] = self.lower_left().d_phi(x, y) * self.upper_right().d_phi(x, y)
 
         x, y = self.upper_right().coords()
-        stiffness_matrix[0][0] = self.upper_left().d_phi(x, y) * self.lower_right().d_phi(x, y)
+        stiffness_matrix[1][1] = self.upper_left().d_phi(x, y) * self.lower_right().d_phi(x, y)
 
         x, y = self.lower_right().coords()
-        stiffness_matrix[0][0] = self.upper_right().d_phi(x, y) * self.lower_left().d_phi(x, y)
+        stiffness_matrix[1][0] = self.upper_right().d_phi(x, y) * self.lower_left().d_phi(x, y)
 
         return stiffness_matrix
 
@@ -164,3 +166,17 @@ class Rectangle(IFinite):
     #     prop[1][1] = y_conduct
     #
     #     return prop
+
+# ll = Node((1, 1), (2, 1), (1, 2))
+# ul = Node((1, 2), (1, 1), (2, 2))
+# ur = Node((2, 2), (1, 2), (2, 1))
+# lr = Node((2, 1), (2, 2), (1, 1))
+#
+# nodes = {"lower-left": ll,
+#          "upper-left": ul,
+#          "upper-right": ur,
+#          "lower-right": lr}
+#
+# rect = Rectangle(nodes, lambda x, y: random.randint(1, 10))
+# print(rect.mass())
+# print(rect.stiffness())
