@@ -30,7 +30,7 @@ class IStorage(ABC):
         pass
 
     @abstractmethod
-    def store(self, session: str, step: Frame) -> None:
+    def store(self, session: str, step: int, frame: Frame) -> None:
         pass
 
     @abstractmethod
