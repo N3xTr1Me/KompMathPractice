@@ -1,5 +1,3 @@
-import random
-
 from Interfaces.mesh.finite_element import IFinite
 
 from Data.mesh.node import Node
@@ -21,21 +19,29 @@ class Rectangle(IFinite):
                 raise ValueError(f"{vertex} not found among nodes!")
 
         # checking if the form is correct
-        if nodes["lower-left"].x() == nodes["upper-left"].x() or \
-                nodes["upper-left"].y() == nodes["upper-right"].y() or \
-                nodes["upper-right"].x() == nodes["lower-right"].y() or \
-                nodes["lower-right"].y() == nodes["lower-left"].y():
+        if nodes["lower-left"].x() != nodes["upper-left"].x() or \
+                nodes["upper-left"].y() != nodes["upper-right"].y() or \
+                nodes["upper-right"].x() != nodes["lower-right"].x() or \
+                nodes["lower-right"].y() != nodes["lower-left"].y():
 
+            raise ValueError("Cannot build a rectangle with given nodes!")
+
+        else:
             # initializing nodes
-            self.__nodes = nodes
+            self.__nodes = self._set_connections(nodes)
 
             # initializing nodal values
             self._set_values(f)
 
-        else:
-            raise ValueError("Cannot build a rectangle with given nodes!")
-
     # ------------------------------------------------------------------------------------------------------------------
+
+    def _set_connections(self, nodes: Dict[str, Node]) -> Dict[str, Node]:
+        nodes["lower-left"].set_neighbours(nodes["lower-right"], nodes["upper-left"])
+        nodes["upper-left"].set_neighbours(nodes["lower-left"], nodes["upper-right"])
+        nodes["upper-right"].set_neighbours(nodes["upper-left"], nodes["lower-right"])
+        nodes["lower-right"].set_neighbours(nodes["upper-right"], nodes["lower-left"])
+
+        return nodes
 
     # Sets nodal values for nodes
     def _set_values(self, f: callable) -> None:
@@ -167,10 +173,10 @@ class Rectangle(IFinite):
     #
     #     return prop
 
-# ll = Node((1, 1), (2, 1), (1, 2))
-# ul = Node((1, 2), (1, 1), (2, 2))
-# ur = Node((2, 2), (1, 2), (2, 1))
-# lr = Node((2, 1), (2, 2), (1, 1))
+# ll = Node((2, 2), 12)
+# ul = Node((2, 3), -1)
+# ur = Node((3, 3), 0)
+# lr = Node((3, 2), 5)
 #
 # nodes = {"lower-left": ll,
 #          "upper-left": ul,
