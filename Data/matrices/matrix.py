@@ -194,9 +194,9 @@ class Matrix(IMatrix, IDecomposition):
             return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
 
         else:
-            if self.__check(other):
+            if self.columns() == other.shape[0]:
                 new_matrix = np.dot(self.get_data(), other)
-                return Matrix(rows=self.rows(), columns=self.columns(), data=new_matrix)
+                return Matrix(rows=self.rows(), columns=other.shape[1], data=new_matrix)
             else:
                 raise ValueError(f"Cannot perform multiplication with shapes: {self.rows(), self.columns()} and "
                                  f"{other.shape[0], other.shape[1]}!")

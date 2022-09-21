@@ -11,19 +11,20 @@ from Model.algorithm.frame import Frame
 
 
 class Model:
-    def __init__(self, T: int, step: float, dimensions: Tuple[int, int], right_side: callable = None):
+    def __init__(self, T: float, step: float, dimensions: Tuple[int, int], right_side: callable = None):
 
         # right border of I (time interval)
         self.__T = T
         # time step of I
         self.__t = step
         # current step
+        self.__time_step = 0
         self.__step = 0
 
         # --------------------------------------------------------------------------------------------------------------
 
-        cache_path = "../Cache/sessions/"
-        config_path = "../Config/config.json"
+        cache_path = "./Cache/sessions/"
+        config_path = "./Config/config.json"
 
         self.__storage = Storage(config_path, cache_path)
         self.__config = self.__storage.get_config()
@@ -35,13 +36,9 @@ class Model:
 
         # --------------------------------------------------------------------------------------------------------------
 
-        self.__basis = Basis({"phi_1": lambda x, y, w, h: (x + w) - (4 * y - h) + 1,
-                              "phi_2": lambda x, y, w, h: (2 * x - w) + (y + h) - 5,
-                              "d_phi_1": lambda x, y, w, h: 1,
-                              "d_phi_2": lambda x, y, w, h: 2
-                              })
+        self.__basis = None
 
-        self.__solver = FEM(dimensions, self.__basis, self.__right_side)
+        self.__solver = FEM(dimensions, self.__right_side)
 
         self.__session = ""
         self.__cached = []
@@ -58,10 +55,10 @@ class Model:
     def __start_calculation(self):
         self.__session = self.__storage.start_session()
 
-    def __cache(self, step: Frame) -> None:
-        self.__cached.append(step.t())
+    def __cache(self, frame: Frame) -> None:
+        self.__cached.append(self.__step)
 
-        self.__storage.store(self.__session, step)
+        self.__storage.store(self.__session, self.__step, frame)
 
     def get(self, step: float) -> Frame:
         return self.__storage.get_step(self.__session, step)
@@ -71,21 +68,26 @@ class Model:
         if not self.__session:
             self.__start_calculation()
 
-        if self.__step == 0:
+        if self.__time_step == 0:
             iteration = self.__solver.step(self.__t)
         else:
             iteration = self.__solver.step(self.__t, self.__current())
 
-        self.__step += self.__t
+        self.__time_step = round(self.__time_step + self.__t, 7)
+        self.__step += 1
 
-        iteration.set_temperatures(self.__basis)
+        # iteration.set_temperatures(self.__basis)
         self.__cache(iteration)
         return iteration
 
-    def run_algorithm(self):
+    def run_algorithm(self) -> Frame:
 
         if not self.__session:
             self.__start_calculation()
 
-        while self.__step < self.__T:
+        iteration = None
+
+        while self.__time_step < self.__T:
             iteration = self.make_step()
+
+        return iteration

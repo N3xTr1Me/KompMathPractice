@@ -1,36 +1,65 @@
-from Interfaces.mesh.basis_interface import IBasis
+from Interfaces.basis.basis_interface import IBasis
+
+from Data.basis.nodal_function import Phi
+from Data.basis.nodal_derivative import DPhi
 
 from typing import Dict, Tuple
 
 
 class Basis(IBasis):
-    def __init__(self, functions: Dict[str, callable]):
+    def __init__(self, j: Tuple[float, float], k: Tuple[float, float]):
 
-        if "phi_1" not in functions:
-            raise ValueError("phi_1 not found in basis!")
-        elif "phi_2" not in functions:
-            raise ValueError("phi_2 not found in basis!")
-        elif "d_phi_1" not in functions:
-            raise ValueError("d_phi_1 not found in basis!")
-        elif "d_phi_2" not in functions:
-            raise ValueError("d_phi_2 not found in basis!")
+        constants = self._get_constants(j, k)
 
-        self.__basis = functions
+        self.__nodal = Phi(constants)
+        self.__derivative = DPhi(constants)
 
-    def phi_1(self, x: float, y: float, w: int, h: int) -> float:
-        return self.__basis["phi_1"](x, y, w, h)
+    def _get_constants(self, j: Tuple[float, float], k: Tuple[float, float]) -> Dict[str, float]:
+        constants = dict()
 
-    def phi_2(self, x: float, y: float, w: int, h: int) -> float:
-        return self.__basis["phi_2"](x, y, w, h)
+        constants["a"] = j[0] * k[1] - k[0] * j[1]
+        constants["b"] = j[1] - k[1]
+        constants["c"] = k[0] - j[0]
 
-    def d_phi_1(self, x: float, y: float, w: int, h: int) -> float:
-        return self.__basis["d_phi_1"](x, y, w, h)
+        return constants
 
-    def d_phi_2(self, x: float, y: float, w: int, h: int) -> float:
-        return self.__basis["d_phi_2"](x, y, w, h)
+    def phi(self) -> Phi:
+        return self.__nodal
 
-    def __call__(self, func: str, dot: Tuple[float, float], w: int, h: int) -> float:
-        if func in self.__basis:
-            return self.__basis[func](dot[0], dot[1], w, h)
-        else:
-            raise ValueError(f"There is no {func} in basis!")
+    def d_phi(self) -> DPhi:
+        return self.__derivative
+
+    def get_a(self) -> float:
+        return self.__nodal.a()
+
+    def get_b(self) -> float:
+        return self.__nodal.b()
+
+    def get_c(self) -> float:
+        return self.__nodal.c()
+
+    def f(self, x: float, y: float) -> float:
+        return self.__nodal(x, y)
+
+    def df(self, x: float, y: float) -> float:
+        return self.__derivative(x, y)
+
+    def __call__(self, x: float = None, y: float = None, derivative: bool = False):
+        if derivative:
+            if x is not None and y is not None:
+                return self.df(x, y)
+
+            return self.d_phi()
+
+        if x is not None and y is not None:
+            return self.f(x, y)
+
+        return self.phi()
+
+    def __str__(self):
+        string = "basis [\n"
+        string += "nodal: " + str(self.__nodal) + "\n"
+        string += "derivative: " + str(self.__derivative) + "\n"
+        string += "]"
+
+        return string

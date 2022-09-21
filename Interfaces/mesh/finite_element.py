@@ -1,37 +1,26 @@
 from abc import ABC, abstractmethod
 
-from Data.mesh.node import Node
-
+from typing import Dict
 from numpy import array
+
+from Data.mesh.node import Node
 
 
 # A finite element interface
 class IFinite(ABC):
 
     @abstractmethod
-    def mass(self, w: int, h: int) -> array:
+    def _set_connections(self, nodes: Dict[str, Node]) -> Dict[str, Node]:
         pass
 
     @abstractmethod
-    def stiffness(self, w: int, h: int) -> array:
+    def _set_values(self, f: callable) -> None:
         pass
 
     @abstractmethod
-    def basis(self, function: str, dot: Node, w: int, h: int) -> float:
+    def mass(self) -> array:
         pass
 
     @abstractmethod
-    def phi_1(self, dot: Node, w: int, h: int) -> float:
-        pass
-
-    @abstractmethod
-    def phi_2(self, dot: Node, w: int, h: int) -> float:
-        pass
-
-    @abstractmethod
-    def d_phi_1(self, dot: Node, w: int, h: int) -> float:
-        pass
-
-    @abstractmethod
-    def d_phi_2(self, dot: Node, w: int, h: int) -> float:
+    def stiffness(self) -> array:
         pass

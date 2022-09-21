@@ -117,9 +117,9 @@ class Storage(IStorage):
         self.__storage = path
 
     # Cache the step to given session
-    def store(self, session: str, step: Frame) -> None:
-        path = self.__json_file(session, step.t())
-        self.write(path, step.cache(), True)
+    def store(self, session: str, step: int, frame: Frame) -> None:
+        path = self.__json_file(session, step)
+        self.write(path, frame.cache(), True)
 
     # Returns step from a given session
     def get_step(self, session: str, step: float) -> Frame:

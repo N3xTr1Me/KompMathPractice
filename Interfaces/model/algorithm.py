@@ -18,7 +18,7 @@ class IAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def _b(self) -> Matrix:
+    def _b(self, current: float, previous: float) -> Matrix:
         pass
 
     @abstractmethod
