@@ -1,65 +1,42 @@
+from Data.grid.dot import Dot
 from Interfaces.basis.basis_interface import IBasis
 
 from Data.basis.nodal_function import Phi
 from Data.basis.nodal_derivative import DPhi
 
-from typing import Dict, Tuple
+from typing import Dict, List
 
 
 class Basis(IBasis):
-    def __init__(self, j: Tuple[float, float], k: Tuple[float, float]):
+    def __init__(self, constants: List[Dict[str, float]]):
 
-        constants = self._get_constants(j, k)
+        self.__nodal = []
+        self.__derivative = []
 
-        self.__nodal = Phi(constants)
-        self.__derivative = DPhi(constants)
+        for constant in constants:
+            self.__nodal.append(Phi(constant))
+            self.__derivative.append(DPhi(constant))
 
-    def _get_constants(self, j: Tuple[float, float], k: Tuple[float, float]) -> Dict[str, float]:
-        constants = dict()
+    def phi(self, index: int) -> Phi:
+        return self.__nodal[index]
 
-        constants["a"] = j[0] * k[1] - k[0] * j[1]
-        constants["b"] = j[1] - k[1]
-        constants["c"] = k[0] - j[0]
+    def d_phi(self, index: int) -> DPhi:
+        return self.__derivative[index]
 
-        return constants
+    def f(self, index: int, dot: Dot) -> float:
+        return self.__nodal[index](dot)
 
-    def phi(self) -> Phi:
-        return self.__nodal
+    def df(self, index: int, dot: Dot) -> float:
+        return self.__derivative[index](dot)
 
-    def d_phi(self) -> DPhi:
-        return self.__derivative
-
-    def get_a(self) -> float:
-        return self.__nodal.a()
-
-    def get_b(self) -> float:
-        return self.__nodal.b()
-
-    def get_c(self) -> float:
-        return self.__nodal.c()
-
-    def f(self, x: float, y: float) -> float:
-        return self.__nodal(x, y)
-
-    def df(self, x: float, y: float) -> float:
-        return self.__derivative(x, y)
-
-    def __call__(self, x: float = None, y: float = None, derivative: bool = False):
+    def __call__(self, index: int, derivative: bool = False, dot: Dot = None):
         if derivative:
-            if x is not None and y is not None:
-                return self.df(x, y)
+            if dot is not None:
+                return self.df(index, dot)
 
-            return self.d_phi()
+            return self.d_phi(index)
 
-        if x is not None and y is not None:
-            return self.f(x, y)
+        if dot is not None:
+            return self.f(index, dot)
 
-        return self.phi()
-
-    def __str__(self):
-        string = "basis [\n"
-        string += "nodal: " + str(self.__nodal) + "\n"
-        string += "derivative: " + str(self.__derivative) + "\n"
-        string += "]"
-
-        return string
+        return self.phi(index)
