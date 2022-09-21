@@ -14,11 +14,11 @@ class INode(ABC):
         pass
 
     @abstractmethod
-    def j(self):
+    def i(self):
         pass
 
     @abstractmethod
-    def k(self):
+    def j(self):
         pass
 
     @abstractmethod

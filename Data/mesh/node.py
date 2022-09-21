@@ -8,11 +8,11 @@ from typing import Tuple
 # a node-dot on the 2D grid. Has (x,y) coordinates, a set of basis functions and nodal value, holds 2 neighboring
 # node's coordinates
 class Node(INode):
-    def __init__(self, i: Tuple[float, float], u: float):
+    def __init__(self, i: Tuple[float, float], u: float = None):
         super(Node, self).__init__()
 
         # initializing node's coordinates and temperature
-        self.__i = i
+        self.__xy = i
 
         # setting 2 neighbouring nodes
         self.__connected = {"left": None,
@@ -29,13 +29,13 @@ class Node(INode):
     # ----------------------------------------------------------------------------------------------------------------------
 
     def x(self) -> float:
-        return self.__i[0]
+        return self.__xy[0]
 
     def y(self) -> float:
-        return self.__i[1]
+        return self.__xy[1]
 
     def coords(self) -> Tuple[float, float]:
-        return self.__i
+        return self.__xy
 
     def set_neighbours(self, j, k) -> None:
         if type(j) is Node and type(k) is Node:
@@ -48,11 +48,11 @@ class Node(INode):
             raise TypeError("Non Node class values were given!")
 
     # Returns "left" neighbours coordinates
-    def j(self):
+    def i(self):
         return self.__connected["left"]
 
     # Returns "right" neighbours coordinates
-    def k(self):
+    def j(self):
         return self.__connected["right"]
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@ class Node(INode):
         return f"|| {self.__j} - [" + self.__str__() + f"] - {self.__k} ||"
 
     def __str__(self):
-        return f"{self.__i}"
+        return f"{self.__xy}"
 
     def __eq__(self, other):
         if self.x() == other.x() and self.y() == other.y():
