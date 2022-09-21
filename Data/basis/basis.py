@@ -44,7 +44,7 @@ class Basis(IBasis):
     def df(self, x: float, y: float) -> float:
         return self.__derivative(x, y)
 
-    def __call__(self, x: float = None, y: float = None, derivative: bool = False) -> float | callable:
+    def __call__(self, x: float = None, y: float = None, derivative: bool = False):
         if derivative:
             if x is not None and y is not None:
                 return self.df(x, y)
