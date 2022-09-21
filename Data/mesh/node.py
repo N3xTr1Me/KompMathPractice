@@ -8,23 +8,23 @@ from typing import Tuple
 # a node-dot on the 2D grid. Has (x,y) coordinates, a set of basis functions and nodal value, holds 2 neighboring
 # node's coordinates
 class Node(INode):
-    def __init__(self, i: Tuple[float, float], j: Tuple[float, float], k: Tuple[float, float]):
+    def __init__(self, i: Tuple[float, float], u: float):
         super(Node, self).__init__()
 
         # initializing node's coordinates and temperature
         self.__i = i
 
         # setting 2 neighbouring nodes
-        self.__j = j
-        self.__k = k
+        self.__connected = {"left": None,
+                            "right": None}
 
         # initializing node's basis functions, consisting of
         # the original function: ax + by + c,
         # and it's first derivative
-        self.__basis = Basis(j, k)
+        self.__basis = None
 
         # Nodal value
-        self.__u = None
+        self.__u = u
 
     # ----------------------------------------------------------------------------------------------------------------------
 
@@ -37,15 +37,28 @@ class Node(INode):
     def coords(self) -> Tuple[float, float]:
         return self.__i
 
+    def set_neighbours(self, j, k) -> None:
+        if type(j) is Node and type(k) is Node:
+            self.__connected["left"] = j
+            self.__connected["right"] = k
+
+            self.set_basis(j.coords(), k.coords())
+
+        else:
+            raise TypeError("Non Node class values were given!")
+
     # Returns "left" neighbours coordinates
-    def j(self) -> Tuple[float, float]:
-        return self.__j
+    def j(self):
+        return self.__connected["left"]
 
     # Returns "right" neighbours coordinates
-    def k(self) -> Tuple[float, float]:
-        return self.__k
+    def k(self):
+        return self.__connected["right"]
 
     # ------------------------------------------------------------------------------------------------------------------
+
+    def set_basis(self, j: Tuple[float, float], k: Tuple[float, float]):
+        self.__basis = Basis(j, k)
 
     # Returns "a" constant from nodal basis function
     def a(self) -> float:

@@ -10,11 +10,15 @@ class INode(ABC):
         pass
 
     @abstractmethod
-    def j(self) -> Tuple[float, float]:
+    def set_neighbours(self, j, k) -> None:
         pass
 
     @abstractmethod
-    def k(self) -> Tuple[float, float]:
+    def j(self):
+        pass
+
+    @abstractmethod
+    def k(self):
         pass
 
     @abstractmethod
@@ -23,6 +27,10 @@ class INode(ABC):
 
     @abstractmethod
     def set_u(self, value: float) -> None:
+        pass
+
+    @abstractmethod
+    def set_basis(self, j: Tuple[float, float], k: Tuple[float, float]):
         pass
 
     @abstractmethod
