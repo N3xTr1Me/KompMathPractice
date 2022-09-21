@@ -54,7 +54,7 @@ class Rectangle(IFinite):
         return self.__nodes["upper-left"]
 
     def upper_right(self) -> Node:
-        return self.__nodes["upper_right"]
+        return self.__nodes["upper-right"]
 
     # ------------------------------------------------------------------------------------------------------------------
 
