@@ -6,19 +6,15 @@ from numpy import array
 class IDomain(ABC):
 
     @abstractmethod
-    def rows(self) -> int:
+    def length(self) -> int:
         pass
 
     @abstractmethod
-    def columns(self) -> int:
+    def _generate_nodes(self, heat_source: callable) -> list:
         pass
 
     @abstractmethod
-    def _generate_nodes(self) -> list:
-        pass
-
-    @abstractmethod
-    def _map_mesh(self, heat_source: callable) -> list:
+    def get_load(self, f: callable) -> array:
         pass
 
     @abstractmethod
@@ -30,5 +26,5 @@ class IDomain(ABC):
         pass
 
     @abstractmethod
-    def update_u(self, row: int, column: int, value: float):
+    def update_u(self, ksi: array) -> None:
         pass
