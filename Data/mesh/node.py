@@ -18,8 +18,8 @@ class Node(INode, Dot):
     def update(self, value: float) -> None:
         self.__u = value
 
-    def connect(self) -> None:
-        self.__connected += 1
-        
+    def connect(self, number: int) -> None:
+        self.__connected += number
+
     def connected(self) -> int:
         return self.__connected

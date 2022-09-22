@@ -36,6 +36,12 @@ class Rectangle(IFinite):
 
     # ------------------------------------------------------------------------------------------------------------------
 
+    def _check_dot(self, x: int, y: int, dot: Dot):
+        if self.__nodes[y][x] == dot:
+            return True
+
+        return False
+
     def _get_h(self, nodes: List[List[Dot]]) -> Dict[str, float]:
         return {"x": 1, "y": 1}
 
@@ -85,6 +91,13 @@ class Rectangle(IFinite):
 
     def upper_right(self) -> Dot:
         return self.__nodes[1][1]
+
+    def update_dot(self, x: int, y: int, dot: Dot):
+        if self._check_dot(x, y, dot):
+            self.__nodes[y][x] = dot
+        else:
+            raise ValueError(
+                f"Given dot: {dot.coords()}, doesn't match {self.__nodes[y][x].coords()} it's trying to replace!")
 
     # ------------------------------------------------------------------------------------------------------------------
 
