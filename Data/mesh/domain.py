@@ -41,17 +41,8 @@ class Domain(IDomain):
 
         for i in range(height):
             for j in range(width):
-                if i % 2 == 1 and j % 2 == 1:
+                if 1 <= i < height and 1 <= j < width:
                     nodes.append(Node(j, i, heat_source(j, i)))
-
-        for i in range(width):
-            if i % 2 == 1:
-                nodes.append(Node(i, height - 1, heat_source(j, i)))
-
-        for i in range(height):
-            if i % 2 == 1:
-                nodes.append(Node(width - 1, i, heat_source(j, i)))
-
         return grid, nodes
 
     def get_load(self, f: callable) -> np.array:
