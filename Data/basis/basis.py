@@ -1,8 +1,8 @@
 from Data.grid.dot import Dot
 from Interfaces.basis.basis_interface import IBasis
 
-from Data.basis.nodal_function import Phi
-from Data.basis.nodal_derivative import DPhi
+from Data.basis.global_basis.global_function import Phi
+from Data.basis.global_basis.global_derivative import DPhi
 
 from typing import Dict, List
 
@@ -10,33 +10,29 @@ from typing import Dict, List
 class Basis(IBasis):
     def __init__(self, constants: List[Dict[str, float]]):
 
-        self.__nodal = []
-        self.__derivative = []
+        self._functions = []
+        self._derivatives = []
 
         for constant in constants:
-            self.__nodal.append(Phi(constant))
-            self.__derivative.append(DPhi(constant))
+            self._functions.append(self._make_function(constant))
+            self._derivatives.append(self._make_derivative(constant))
 
-    def phi(self, index: int) -> Phi:
-        return self.__nodal[index]
+    def _make_function(self, constant: Dict[str, float]):
+        return Phi(constant)
 
-    def d_phi(self, index: int) -> DPhi:
-        return self.__derivative[index]
+    def _make_derivative(self, constant: Dict[str, float]):
+        return DPhi(constant)
 
     def f(self, index: int, dot: Dot) -> float:
-        return self.__nodal[index](dot)
+        return self._functions[index](dot)
 
     def df(self, index: int, dot: Dot) -> float:
-        return self.__derivative[index](dot)
+        return self._derivatives[index](dot)
 
     def __call__(self, index: int, dot: Dot = None, derivative: bool = False):
         if derivative:
             if dot is not None:
                 return self.df(index, dot)
 
-            return self.d_phi(index)
-
         if dot is not None:
             return self.f(index, dot)
-
-        return self.phi(index)
