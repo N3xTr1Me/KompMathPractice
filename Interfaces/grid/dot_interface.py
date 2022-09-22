@@ -6,12 +6,12 @@ from typing import Tuple
 class IDot(ABC):
 
     @abstractmethod
-    def x(self) -> int:
+    def x(self) -> float:
         pass
 
     @abstractmethod
-    def y(self) -> int:
-        return self._y
+    def y(self) -> float:
+        pass
 
     @abstractmethod
     def coords(self) -> Tuple[float, float]:

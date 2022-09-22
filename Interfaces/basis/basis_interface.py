@@ -24,5 +24,5 @@ class IBasis(ABC):
         pass
 
     @abstractmethod
-    def __call__(self, index: int, derivative: bool = False, dot: Dot = None):
+    def __call__(self, index: int, dot: Dot = None, derivative: bool = False):
         pass

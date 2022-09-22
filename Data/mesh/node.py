@@ -10,9 +10,16 @@ class Node(INode, Dot):
         super(Node, self).__init__(x, y)
 
         self.__u = value
+        self.__connected = 0
 
     def u(self) -> float:
         return self.__u
 
     def update(self, value: float) -> None:
         self.__u = value
+
+    def connect(self) -> None:
+        self.__connected += 1
+        
+    def connected(self) -> int:
+        return self.__connected

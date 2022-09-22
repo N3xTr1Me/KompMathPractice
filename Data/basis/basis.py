@@ -29,7 +29,7 @@ class Basis(IBasis):
     def df(self, index: int, dot: Dot) -> float:
         return self.__derivative[index](dot)
 
-    def __call__(self, index: int, derivative: bool = False, dot: Dot = None):
+    def __call__(self, index: int, dot: Dot = None, derivative: bool = False):
         if derivative:
             if dot is not None:
                 return self.df(index, dot)

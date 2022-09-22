@@ -1,15 +1,17 @@
+from Interfaces.grid.dot_interface import IDot
+
 from typing import Tuple
 
 
-class Dot:
-    def __init__(self, x: int, y: int):
+class Dot(IDot):
+    def __init__(self, x: float, y: float):
         self._x = x
         self._y = y
 
-    def x(self) -> int:
+    def x(self) -> float:
         return self._x
 
-    def y(self) -> int:
+    def y(self) -> float:
         return self._y
 
     def coords(self) -> Tuple[float, float]:

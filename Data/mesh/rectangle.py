@@ -1,113 +1,175 @@
 from Interfaces.mesh.finite_element import IFinite
 
-from Data.mesh.node import Node
+from Data.grid.dot import Dot
+from Data.basis.basis import Basis
 
-from typing import Dict
+from typing import Dict, List
 import numpy as np
 
 
 # A rectangular finite element on a 2D grid.
 class Rectangle(IFinite):
-    def __init__(self, nodes: Dict[str, Node], f: callable):
+    def __init__(self, nodes: List[List[Dot]]):
         super(Rectangle, self).__init__()
 
         # checking the minimal requirements
-        vertexes = ["lower-left", "upper-left", "upper-right", "lower-right"]
-
-        for vertex in vertexes:
-            if vertex not in nodes:
-                raise ValueError(f"{vertex} not found among nodes!")
+        if len(nodes) < 2 or len(nodes[0]) < 2 or len(nodes[1]) < 2:
+            raise ValueError("Not enough dots to build a rectangle!")
 
         # checking if the form is correct
-        if nodes["lower-left"].x() != nodes["upper-left"].x() or \
-                nodes["upper-left"].y() != nodes["upper-right"].y() or \
-                nodes["upper-right"].x() != nodes["lower-right"].x() or \
-                nodes["lower-right"].y() != nodes["lower-left"].y():
+        if nodes[0][0].x() != nodes[1][0].x() or \
+                nodes[1][0].y() != nodes[1][1].y() or \
+                nodes[1][1].x() != nodes[0][1].x() or \
+                nodes[0][1].y() != nodes[0][0].y():
 
             raise ValueError("Cannot build a rectangle with given nodes!")
 
         else:
             # initializing nodes
-            self.__nodes = self._set_connections(nodes)
+            self.__nodes = nodes
 
-            # initializing nodal values
-            self._set_values(f)
+            # side length
+            self.__h = self._get_h(nodes)
 
-    # ------------------------------------------------------------------------------------------------------------------
-
-    def _set_connections(self, nodes: Dict[str, Node]) -> Dict[str, Node]:
-        nodes["lower-left"].set_neighbours(nodes["lower-right"], nodes["upper-left"])
-        nodes["upper-left"].set_neighbours(nodes["lower-left"], nodes["upper-right"])
-        nodes["upper-right"].set_neighbours(nodes["upper-left"], nodes["lower-right"])
-        nodes["lower-right"].set_neighbours(nodes["upper-right"], nodes["lower-left"])
-
-        return nodes
-
-    # Sets nodal values for nodes
-    def _set_values(self, f: callable) -> None:
-
-        for node in self.__nodes:
-            x, y = self.__nodes[node].coords()
-            self.__nodes[node].set_u(f(x, y))
+            # local basis of element
+            self.__basis = Basis(self._constants(self.side()))
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def lower_left(self) -> Node:
-        return self.__nodes["lower-left"]
+    def _get_h(self, nodes: List[List[Dot]]) -> float:
+        return 1
 
-    def lower_right(self) -> Node:
-        return self.__nodes["lower-right"]
+    def side(self) -> float:
+        return self.__h
 
-    def upper_left(self) -> Node:
-        return self.__nodes["upper-left"]
+    def _constants(self, h: float) -> List[Dict[str, float]]:
+        constants = []
+        coefficient = 1 / h
 
-    def upper_right(self) -> Node:
-        return self.__nodes["upper-right"]
+        for i in range(4):
+            constants.append(self._phi(i, coefficient))
+
+        return constants
+
+    def _phi(self, index: int, c: float) -> Dict[str, float]:
+        if index == 0:
+            return {"a": -1 * c, "b": -1 * c, "c": 1 * c}
+
+        elif index == 1:
+            return {"a": 1 * c, "b": 0, "c": 0}
+
+        elif index == 2:
+            return {"a": 0, "b": 1 * c, "c": 0}
+
+        else:
+            return {"a": 1 * c, "b": 1 * c, "c": 0}
 
     # ------------------------------------------------------------------------------------------------------------------
+
+    def lower_left(self) -> Dot:
+        return self.__nodes[0][0]
+
+    def lower_right(self) -> Dot:
+        return self.__nodes[0][1]
+
+    def upper_left(self) -> Dot:
+        return self.__nodes[1][0]
+
+    def upper_right(self) -> Dot:
+        return self.__nodes[1][1]
+
+    # ------------------------------------------------------------------------------------------------------------------
+
+    def _midpoint(self, start: Dot, end: Dot) -> Dot:
+        return Dot(x=(end.x() + start.x()) / 2, y=(end.y() + start.y()) / 2)
+
+    def _edge(self, i: int, j: int) -> Dot:
+        if i == j:
+            return self._midpoint(self.__nodes[i % 2][j % 2], self.__nodes[i % 2][j % 2])
+        else:
+
+            if i == 0:
+                start = self.lower_left()
+
+                if j == 1:
+                    end = self.upper_left()
+
+                elif j == 3:
+                    end = self.lower_right()
+
+                else:
+                    return Dot(0, 0)
+
+                return self._midpoint(start, end)
+
+            elif i == 1:
+                start = self.upper_left()
+
+                if j == 0:
+                    end = self.lower_left()
+
+                elif j == 2:
+                    end = self.upper_right()
+
+                else:
+                    return Dot(0, 0)
+
+                return self._midpoint(start, end)
+
+            elif i == 2:
+                start = self.upper_right()
+
+                if j == 1:
+                    end = self.upper_left()
+
+                elif j == 3:
+                    end = self.lower_right()
+                else:
+                    return Dot(0, 0)
+
+                return self._midpoint(start, end)
+
+            else:
+                start = self.lower_right()
+
+                if j == 0:
+                    end = self.lower_left()
+
+                elif j == 2:
+                    end = self.upper_right()
+                else:
+                    return Dot(0, 0)
+
+                return self._midpoint(start, end)
 
     # Returns the local elemental mass matrix
     def mass(self) -> np.array:
-        mass_matrix = np.zeros((2, 2), dtype=float)
+        mass_matrix = np.zeros((4, 4), dtype=float)
 
-        x, y = self.lower_left().coords()
-        mass_matrix[0][0] = self.lower_right().phi(x, y) * self.upper_left().phi(x, y)
-
-        x, y = self.upper_left().coords()
-        mass_matrix[0][1] = self.lower_left().phi(x, y) * self.upper_right().phi(x, y)
-
-        x, y = self.upper_right().coords()
-        mass_matrix[1][1] = self.upper_left().phi(x, y) * self.lower_right().phi(x, y)
-
-        x, y = self.lower_right().coords()
-        mass_matrix[1][0] = self.upper_right().phi(x, y) * self.lower_left().phi(x, y)
+        for i in range(4):
+            for j in range(4):
+                mass_matrix[i][j] = self.__basis(j, self._edge(i, j)) * \
+                                    self.__basis(i, self._edge(i, j))
 
         return mass_matrix
 
     # Returns the local elemental stiffness matrix
     def stiffness(self) -> np.array:
-        stiffness_matrix = np.zeros((2, 2), dtype=float)
+        stiffness_matrix = np.zeros((4, 4), dtype=float)
 
-        x, y = self.lower_left().coords()
-        stiffness_matrix[0][0] = self.lower_right().d_phi(x, y) * self.upper_left().d_phi(x, y)
-
-        x, y = self.upper_left().coords()
-        stiffness_matrix[0][1] = self.lower_left().d_phi(x, y) * self.upper_right().d_phi(x, y)
-
-        x, y = self.upper_right().coords()
-        stiffness_matrix[1][1] = self.upper_left().d_phi(x, y) * self.lower_right().d_phi(x, y)
-
-        x, y = self.lower_right().coords()
-        stiffness_matrix[1][0] = self.upper_right().d_phi(x, y) * self.lower_left().d_phi(x, y)
+        for i in range(4):
+            for j in range(4):
+                stiffness_matrix[i][j] = np.dot(self.__basis(j, self._edge(i, j), True),
+                                                self.__basis(i, self._edge(i, j), True))
 
         return stiffness_matrix
 
     def __repr__(self):
         string = "|"
 
-        for node in self.__nodes:
-            string += str(self.__nodes[node])
-
+        for i in range(2):
+            for j in range(2):
+                string += str(self.__nodes[i][j])
         string += "|"
 
         return string
