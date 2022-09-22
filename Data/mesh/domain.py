@@ -2,6 +2,7 @@ from typing import Dict
 
 import numpy as np
 
+from Data.grid.dot import Dot
 from Data.mesh.node import Node
 from Data.mesh.rectangle import Rectangle
 
@@ -47,13 +48,22 @@ class Domain(IDomain):
 
     # Fills the grid on the field with nodes
     def _generate_nodes(self) -> list:
-        n, m = self.get_height(), self.get_width()
+        height, width = self.get_height(), self.get_width()
 
-        grid = [[None for _ in range(m)] for _ in range(n)]
+        grid = [[Dot(x, y) for x in range(width)] for y in range(height)]
 
-        for i in range(n):
-            for j in range(m):
-                grid[i][j] = Node((j, i))
+        for i in range(height):
+            for j in range(width):
+                if i % 2 == 1 and j % 2 == 1:
+                    grid[i][j] = Node(i, j, 0)
+
+        for i in range(width):
+            if i % 2 == 1:
+                grid[height - 1][i] = Node(i, height - 1, 0)
+
+        for i in range(height):
+            if i % 2 == 1:
+                grid[width - 1][i] = Node(width - 1, i, 0)
 
         return grid
 
