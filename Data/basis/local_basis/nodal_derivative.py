@@ -1,15 +1,15 @@
 import numpy as np
 
-from Data.basis.nodal_function import Phi
+from Data.basis.local_basis.nodal_function import Psi
 from Data.grid.dot import Dot
 
 from typing import Dict
 
 
 # First derivative of the nodal basis function
-class DPhi(Phi):
+class DPsi(Psi):
     def __init__(self, constants: Dict[str, float]):
-        super(DPhi, self).__init__(constants)
+        super(DPsi, self).__init__(constants)
 
     def f(self) -> callable:
         return lambda x, y: np.array([self.a(), self.b()])

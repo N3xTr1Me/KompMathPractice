@@ -1,5 +1,6 @@
 from typing import List
 
+from Data.basis.basis import Basis
 from Data.mesh.node import Node
 from Data.grid.dot import Dot
 from Data.mesh.rectangle import Rectangle
@@ -7,6 +8,7 @@ from Data.mesh.rectangle import Rectangle
 
 class Mesh:
     def __init__(self, width: int, height: int, nodes: List[Node]):
+
         self.__w = width
         self.__h = height
 
@@ -25,6 +27,23 @@ class Mesh:
                                       "up-left": Rectangle(self._up_left(node)),
                                       "up-right": Rectangle(self._up_right(node)),
                                       "low-right": Rectangle(self._down_right(node))}
+
+    def basis(self) -> Basis:
+        constants = []
+
+        for node in self.__mesh:
+            constants.append(self._constant(node))
+
+        return Basis(constants)
+
+    def _constant(self, node: Node):
+        constants = dict()
+
+        constants["k"] = self._diagonal(node)
+        constants["h_x"] = self.__mesh[str(node)]["up-left"].side()
+        constants["h_y"] = self.__mesh[str(node)]["up-left"].side(True)
+
+        return constants
 
     def _down_left(self, node: Node) -> List[List[Dot]]:
         rect = [[None, None], [None, None]]
@@ -66,8 +85,8 @@ class Mesh:
 
         return rect
 
-    def _diagonal(self, node: str, rectangle: str) -> Dot:
-        rects = self.__mesh[node]
+    def _diagonal(self, node: Node, rectangle: str = "up-left") -> Dot:
+        rects = self.__mesh[str(node)]
 
         if rectangle == "low-left":
             return rects[rectangle].lower_left()
@@ -79,8 +98,3 @@ class Mesh:
             return rects[rectangle].upper_right()
 
         return rects[rectangle].lower_right()
-
-
-_nodes = [Node(1, 1, -12), Node(1, 3, 5), Node(3, 1, -8), Node(3, 3, 0)]
-mesh = Mesh(4, 4, _nodes)
-print(mesh._diagonal("(3, 1)", "low-left"))

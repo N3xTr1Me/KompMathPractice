@@ -1,7 +1,7 @@
 from Interfaces.mesh.finite_element import IFinite
 
 from Data.grid.dot import Dot
-from Data.basis.basis import Basis
+from Data.basis.local_basis.elemental_basis import Elemental
 
 from typing import Dict, List
 import numpy as np
@@ -31,22 +31,30 @@ class Rectangle(IFinite):
             # side length
             self.__h = self._get_h(nodes)
 
-            # local basis of element
-            self.__basis = Basis(self._constants(self.side()))
+            # local_basis basis of element
+            self.__basis = Elemental(self._constants())
 
     # ------------------------------------------------------------------------------------------------------------------
 
-    def _get_h(self, nodes: List[List[Dot]]) -> float:
-        return 1
+    def _get_h(self, nodes: List[List[Dot]]) -> Dict[str, float]:
+        return {"x": 1, "y": 1}
 
-    def side(self) -> float:
-        return self.__h
+    def side(self, y: bool = False) -> float:
+        if y:
+            return self.__h["y"]
 
-    def _constants(self, h: float) -> List[Dict[str, float]]:
+        return self.__h["x"]
+
+    def _constants(self) -> List[Dict[str, float]]:
         constants = []
-        coefficient = 1 / h
 
         for i in range(4):
+            if i % 2 == 0:
+                h = self.side(True)
+            else:
+                h = self.side()
+
+            coefficient = 1 / h
             constants.append(self._phi(i, coefficient))
 
         return constants
@@ -142,7 +150,7 @@ class Rectangle(IFinite):
 
                 return self._midpoint(start, end)
 
-    # Returns the local elemental mass matrix
+    # Returns the local_basis elemental mass matrix
     def mass(self) -> np.array:
         mass_matrix = np.zeros((4, 4), dtype=float)
 
@@ -153,7 +161,7 @@ class Rectangle(IFinite):
 
         return mass_matrix
 
-    # Returns the local elemental stiffness matrix
+    # Returns the local_basis elemental stiffness matrix
     def stiffness(self) -> np.array:
         stiffness_matrix = np.zeros((4, 4), dtype=float)
 

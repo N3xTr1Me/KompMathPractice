@@ -1,11 +1,19 @@
 from abc import ABC, abstractmethod
 
 from Data.grid.dot import Dot
-from Data.basis.nodal_function import Phi
-from Data.basis.nodal_derivative import DPhi
+
+from typing import Dict
 
 
 class IBasis(ABC):
+
+    @abstractmethod
+    def _make_function(self, constant: Dict[str, float]):
+        pass
+
+    @abstractmethod
+    def _make_derivative(self, constant: Dict[str, float]):
+        pass
 
     @abstractmethod
     def f(self, index: int, dot: Dot) -> float:
@@ -13,14 +21,6 @@ class IBasis(ABC):
 
     @abstractmethod
     def df(self, index: int, dot: Dot) -> float:
-        pass
-
-    @abstractmethod
-    def phi(self, index: int) -> Phi:
-        pass
-
-    @abstractmethod
-    def d_phi(self, index: int) -> DPhi:
         pass
 
     @abstractmethod
