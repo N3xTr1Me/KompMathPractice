@@ -55,7 +55,7 @@ class Domain(IDomain):
         for i in range(height):
             for j in range(width):
                 if i % 2 == 1 and j % 2 == 1:
-                    grid[i][j] = Node(i, j, 0)
+                    grid[i][j] = Node(j, i, 0)
 
         for i in range(width):
             if i % 2 == 1:
@@ -63,7 +63,7 @@ class Domain(IDomain):
 
         for i in range(height):
             if i % 2 == 1:
-                grid[width - 1][i] = Node(width - 1, i, 0)
+                grid[i][width - 1] = Node(width - 1, i, 0)
 
         return grid
 
