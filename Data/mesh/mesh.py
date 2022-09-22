@@ -13,6 +13,7 @@ class Mesh:
         self.__w = width
         self.__h = height
 
+        self.__elements = None
         self.__mesh = dict()
         self.map_mesh(nodes)
 
@@ -22,11 +23,29 @@ class Mesh:
     def height(self) -> int:
         return self.__h
 
+    def elements(self) -> int:
+        return self.__elements
+
+    def get_element(self, k: int):
+        return self.__elements[k]
+
+    def k(self) -> int:
+        if self.__elements is not None:
+            return len(self.__elements)
+
+        return 0
+
     def check_bound(self, dot: Dot) -> bool:
         if 0 < dot.x() <= self.__w and 0 < dot.y() <= self.__h:
             return True
 
         return False
+
+    def get_index(self, index: int, element: int, y: bool = False):
+        if y:
+            return self.__elements[element].h(y) + index
+
+        return self.__elements[element].h() + index
 
     def map_mesh(self, nodes: List[Node]) -> None:
 
@@ -41,16 +60,16 @@ class Mesh:
             connections[str(node)] = node
 
         connections = self.change_neighbours(connections)
-        new_mesh = {node: [] for node in self.__mesh}
+        elements = []
 
         for node in self.__mesh:
             for i in range(len(self.__mesh[node])):
                 if i in connections[node]:
-                    new_mesh[node].append(Cell(self.__mesh[node][i], connections[node][i]))
+                    elements.append(Cell(self.__mesh[node][i], connections[node][i]))
                 else:
-                    new_mesh[node].append(Cell(self.__mesh[node][i]))
+                    elements.append(Cell(self.__mesh[node][i]))
 
-        self.__mesh = new_mesh
+        self.__elements = elements
 
     def change_neighbours(self, nodes: Dict[str, Node]):
 
@@ -170,26 +189,20 @@ class Mesh:
 
         return rect
 
-    def _diagonal(self, node: str, rectangle: int = 2) -> Dot:
+    def _diagonal(self, node: str, rect: int = 2) -> Dot:
         rects = self.__mesh[node]
 
         # node is upper-right
-        if rectangle == 0:
-            return rects[rectangle].lower_left()
+        if rect == 0:
+            return rects[rect].lower_left()
 
         # node is lower-right
-        if rectangle == 1:
-            return rects[rectangle].upper_left()
+        if rect == 1:
+            return rects[rect].upper_left()
 
         # node is lower-left
-        if rectangle == 2:
-            return rects[rectangle].upper_right()
+        if rect == 2:
+            return rects[rect].upper_right()
 
         # node is upper-left
-        return rects[rectangle].lower_right()
-
-
-_nodes = [Node(1, 1, -12), Node(2, 2, 5), Node(3, 2, -8), Node(2, 3, 0)]
-mesh = Mesh(4, 4, _nodes)
-# k = mesh.basis(_nodes)
-print()
+        return rects[rect].lower_right()

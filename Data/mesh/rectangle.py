@@ -92,6 +92,9 @@ class Rectangle(IFinite):
     def upper_right(self) -> Dot:
         return self.__nodes[1][1]
 
+    def get_dot(self, x: int, y: int) -> Dot:
+        return self.__nodes[y][x]
+
     def update_dot(self, x: int, y: int, dot: Dot):
         if self._check_dot(x, y, dot):
             self.__nodes[y][x] = dot

@@ -1,3 +1,4 @@
+import random
 from typing import Dict, Tuple, List
 
 import numpy as np
@@ -17,7 +18,7 @@ class Domain(IDomain):
         if nodes is not None:
             self.__nodes = nodes
         else:
-            self.__grid, self.__nodes = self._generate_nodes(heat_source)
+            self.__grid, self.__nodes = self._generate_nodes(dimensions, heat_source)
 
         self.__mesh = Mesh(dimensions[0], dimensions[1], self.__nodes)
         self.__basis = self.__mesh.basis(self.__nodes)
@@ -32,8 +33,8 @@ class Domain(IDomain):
         return len(self.__nodes)
 
     # Fills the grid on the field with nodes
-    def _generate_nodes(self, heat_source: callable) -> Tuple[list, list]:
-        height, width = self.get_height(), self.get_width()
+    def _generate_nodes(self, dimensions: Tuple[int, int], heat_source: callable) -> Tuple[list, list]:
+        height, width = dimensions[0], dimensions[1]
 
         grid = [[Dot(x, y) for x in range(width)] for y in range(height)]
 
@@ -58,9 +59,13 @@ class Domain(IDomain):
         rows, columns = self.length(), self.length()
         mass_matrix = np.zeros((rows, columns))
 
-        for y in range(rows):
-            for x in range(columns):
-                mass_matrix[y][x] = self.__grid[y][x].i().phi(x, y) * self.__grid[y][x].j().phi(x, y)
+        for k in range(self.__mesh.k()):
+            E = self.__mesh.get_element(k).get_mass()
+            for i in range(4):
+                y = self.__mesh.get_index(i, k, True)
+                for j in range(4):
+                    x = self.__mesh.get_index(i, k)
+                    mass_matrix[y][x] += E[i][j]
 
         return mass_matrix
 
@@ -78,3 +83,8 @@ class Domain(IDomain):
     def update_u(self, ksi: np.array):
         for i in range(self.length()):
             self.__nodes[i].update(self.__basis(i, self.__nodes[i]) * ksi[i][0])
+
+
+dom = Domain((10, 10), lambda x, y: random.randint(1, 10))
+mass = dom.get_mass()
+print()

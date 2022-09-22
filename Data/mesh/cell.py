@@ -1,8 +1,9 @@
 import numpy as np
 
 from Data.mesh.rectangle import Rectangle
+from Data.grid.dot import Dot
 
-from typing import List, Tuple
+from typing import List
 
 
 class Cell:
@@ -31,3 +32,6 @@ class Cell:
 
     def get_element(self) -> Rectangle:
         return self.__element
+
+    def __call__(self, x: int, y: int) -> Dot:
+        return self.__element.get_dot(x, y)
