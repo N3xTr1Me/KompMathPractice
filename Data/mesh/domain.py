@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 
@@ -47,25 +47,27 @@ class Domain(IDomain):
         return nodes
 
     # Fills the grid on the field with nodes
-    def _generate_nodes(self) -> list:
+    def _generate_nodes(self) -> Tuple[list, list]:
         height, width = self.get_height(), self.get_width()
 
         grid = [[Dot(x, y) for x in range(width)] for y in range(height)]
 
+        nodes = []
+
         for i in range(height):
             for j in range(width):
                 if i % 2 == 1 and j % 2 == 1:
-                    grid[i][j] = Node(j, i, 0)
+                    nodes.append(Node(j, i, 0))
 
         for i in range(width):
             if i % 2 == 1:
-                grid[height - 1][i] = Node(i, height - 1, 0)
+                nodes.append(Node(i, height - 1, 0))
 
         for i in range(height):
             if i % 2 == 1:
-                grid[i][width - 1] = Node(width - 1, i, 0)
+                nodes.append(Node(width - 1, i, 0))
 
-        return grid
+        return grid, nodes
 
     # Constructs the rectangular finite elements from the nodes to form mesh
     def _map_mesh(self, heat_source: callable) -> list:
