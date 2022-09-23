@@ -8,68 +8,87 @@ from Data.mesh.rectangle import Rectangle
 
 
 class Mesh:
-    def __init__(self, width: int, height: int, nodes: List[Node]):
+    def __init__(self, x_int: Tuple[int, int], y_int: Tuple[int, int], x_step: float, y_step: float):
 
-        self.__w = width
-        self.__h = height
+        self.__x = x_int
+        self.__y = y_int
 
-        self.__elements = None
-        self.__mesh = dict()
-        self.map_mesh(nodes)
+        self.__x_step = x_step
+        self.__y_step = y_step
+
+        self.__mesh = []
 
     def width(self) -> int:
-        return self.__w
+        return self.__x[1] - self.__x[0]
 
     def height(self) -> int:
-        return self.__h
+        return self.__y[1] - self.__y[0]
 
-    def elements(self) -> int:
-        return self.__elements
+    def x_step(self) -> float:
+        return self.__x_step
+
+    def y_step(self) -> float:
+        return self.__y_step
 
     def get_element(self, k: int):
-        return self.__elements[k]
+        return self.__mesh[k]
 
     def k(self) -> int:
-        if self.__elements is not None:
-            return len(self.__elements)
+        if self.__mesh is not None:
+            return len(self.__mesh)
 
         return 0
 
     def check_bound(self, dot: Dot) -> bool:
-        if 0 < dot.x() <= self.__w and 0 < dot.y() <= self.__h:
+        if self.check_x(dot) and self.check_y(dot):
             return True
 
         return False
 
-    def get_index(self, index: int, element: int, y: bool = False):
-        if y:
-            return self.__elements[element].h(y) + index
+    def check_x(self, dot: Dot) -> bool:
+        if self.__x[0] <= dot.x() <= self.__x[1]:
+            return True
 
-        return self.__elements[element].h() + index
+        return False
+
+    def check_y(self, dot: Dot) -> bool:
+        if self.__y[0] <= dot.y() <= self.__y[1]:
+            return True
+
+        return False
+
+    def get_x(self, element: int, index: int):
+        return self.__mesh[element][index].x()
+
+    def get_y(self, element: int, index: int):
+        return self.__mesh[element][index].y()
+
+    def _arrange_rect(self, nodes: List[Node], index: int) -> List[Dot]:
+
+        if index % self.width() == self.width() - 1:
+            return [nodes[index],
+                    nodes[index + self.width()],
+                    Dot(nodes[index].x() + self.x_step(), nodes[index].y() + self.y_step()),
+                    Dot(nodes[index].x() + self.x_step(), nodes[index].y())
+                    ]
+
+        return [nodes[index],  # lower-left aka the current node
+                nodes[index + self.width()],  # upper-left node
+                nodes[index + self.width() + 1],  # upper-right node
+                nodes[index + 1]  # lower-left node
+                ]
 
     def map_mesh(self, nodes: List[Node]) -> None:
 
-        connections = dict()
+        mesh = []
 
-        for node in nodes:
-            self.__mesh[str(node)] = [
-                Rectangle(self._down_left(node)), Rectangle(self._up_left(node)),
-                Rectangle(self._up_right(node)), Rectangle(self._down_right(node)),
-            ]
+        for i in range(len(nodes) - self.width()):
 
-            connections[str(node)] = node
+            if self.check_bound(nodes[i]):
+                vertexes = self._arrange_rect(nodes, i)
+                mesh.append(Rectangle(vertexes))
 
-        connections = self.change_neighbours(connections)
-        elements = []
-
-        for node in self.__mesh:
-            for i in range(len(self.__mesh[node])):
-                if i in connections[node]:
-                    elements.append(Cell(self.__mesh[node][i], connections[node][i]))
-                else:
-                    elements.append(Cell(self.__mesh[node][i]))
-
-        self.__elements = elements
+        self.__mesh = mesh
 
     def change_neighbours(self, nodes: Dict[str, Node]):
 

@@ -11,7 +11,7 @@ class IDomain(ABC):
         pass
 
     @abstractmethod
-    def _generate_nodes(self, dimensions: Tuple[int, int], heat_source: callable) -> list:
+    def _generate_nodes(self, heat_source: callable) -> list:
         pass
 
     @abstractmethod

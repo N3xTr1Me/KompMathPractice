@@ -15,26 +15,36 @@ from Interfaces.mesh.domain_interface import IDomain
 class Domain(IDomain):
     def __init__(self, dimensions: Tuple[int, int], heat_source: callable, nodes: List[Node] = None):
 
+        self.__width = dimensions[1]
+        self.__height = dimensions[0]
+
         if nodes is not None:
             self.__nodes = nodes
         else:
-            self.__grid, self.__nodes = self._generate_nodes(dimensions, heat_source)
+            self.__grid, self.__nodes = self._generate_nodes(heat_source)
 
-        self.__mesh = Mesh(dimensions[0], dimensions[1], self.__nodes)
+        self.__mesh = Mesh(self.x_interval(), self.y_interval(), 1, 1)
+        self.__mesh.map_mesh(self.__nodes)
         self.__basis = self.__mesh.basis(self.__nodes)
 
     def get_height(self) -> int:
-        return self.__mesh.height()
+        return self.__height
 
     def get_width(self) -> int:
-        return self.__mesh.width()
+        return self.__width
+
+    def x_interval(self) -> Tuple[int, int]:
+        return 1, self.get_width() - 1
+
+    def y_interval(self) -> Tuple[int, int]:
+        return 1, self.get_height() - 1
 
     def length(self) -> int:
         return len(self.__nodes)
 
     # Fills the grid on the field with nodes
-    def _generate_nodes(self, dimensions: Tuple[int, int], heat_source: callable) -> Tuple[list, list]:
-        height, width = dimensions[0], dimensions[1]
+    def _generate_nodes(self, heat_source: callable) -> Tuple[list, list]:
+        height, width = self.get_height() - 1, self.get_width() - 1
 
         grid = [[Dot(x, y) for x in range(width)] for y in range(height)]
 
@@ -44,6 +54,7 @@ class Domain(IDomain):
             for j in range(width):
                 if 1 <= i < height and 1 <= j < width:
                     nodes.append(Node(j, i, heat_source(j, i)))
+
         return grid, nodes
 
     def get_load(self, f: callable) -> np.array:
@@ -60,11 +71,13 @@ class Domain(IDomain):
         mass_matrix = np.zeros((rows, columns))
 
         for k in range(self.__mesh.k()):
-            E = self.__mesh.get_element(k).get_mass()
+            E = self.__mesh.get_element(k).mass()
             for i in range(4):
-                y = self.__mesh.get_index(i, k, True)
+                print(i, end=" ")
+                y = self.__mesh.get_y(k, i)
                 for j in range(4):
-                    x = self.__mesh.get_index(i, k)
+                    print(j)
+                    x = self.__mesh.get_x(k, j)
                     mass_matrix[y][x] += E[i][j]
 
         return mass_matrix
@@ -86,5 +99,5 @@ class Domain(IDomain):
 
 
 dom = Domain((10, 10), lambda x, y: random.randint(1, 10))
-mass = dom.get_mass()
+mas = dom.get_mass()
 print()
