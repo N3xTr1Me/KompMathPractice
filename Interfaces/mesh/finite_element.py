@@ -10,11 +10,7 @@ from Data.mesh.node import Node
 class IFinite(ABC):
 
     @abstractmethod
-    def _set_connections(self, nodes: Dict[str, Node]) -> Dict[str, Node]:
-        pass
-
-    @abstractmethod
-    def _set_values(self, f: callable) -> None:
+    def side(self) -> float:
         pass
 
     @abstractmethod

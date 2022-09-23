@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 
+from Data.grid.dot import Dot
 
-class INodal(ABC):
+
+class ILocal(ABC):
 
     @abstractmethod
     def a(self) -> float:
@@ -14,11 +16,11 @@ class INodal(ABC):
     @abstractmethod
     def c(self) -> float:
         pass
-    
+
     @abstractmethod
     def f(self) -> callable:
         pass
 
     @abstractmethod
-    def __call__(self, x: float, y: float) -> float:
+    def __call__(self, dot: Dot) -> float:
         pass

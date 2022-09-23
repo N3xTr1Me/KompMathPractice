@@ -1,25 +1,31 @@
-from typing import Dict
+import random
+from typing import Dict, Tuple, List
 
 import numpy as np
 
+from Data.grid.dot import Dot
 from Data.mesh.node import Node
 from Data.mesh.rectangle import Rectangle
+from Data.mesh.mesh import Mesh
 
 from Interfaces.mesh.domain_interface import IDomain
 
 
 # A flyweight class, containing all the sessions defining the 2D region, which thermal conditions are to be found
 class Domain(IDomain):
-    def __init__(self, width: int, height: int, heat_source: callable):
+    def __init__(self, dimensions: Tuple[int, int], heat_source: callable, nodes: List[Node] = None):
 
-        # Initial mesh dimensions
-        self.__width = width
-        self.__height = height
+        self.__width = dimensions[1]
+        self.__height = dimensions[0]
 
-        # Table of nodes on the mesh
-        self.__grid = self._generate_nodes()
-        # Table of finite elements, built on the mesh nodes
-        self.__mesh = self._map_mesh(heat_source)
+        if nodes is not None:
+            self.__nodes = nodes
+        else:
+            self.__grid, self.__nodes = self._generate_nodes(heat_source)
+
+        self.__mesh = Mesh(self.x_interval(), self.y_interval(), 1, 1)
+        self.__mesh.map_mesh(self.__nodes)
+        self.__basis = self.__mesh.basis(self.__nodes)
 
     def get_height(self) -> int:
         return self.__height
@@ -27,57 +33,52 @@ class Domain(IDomain):
     def get_width(self) -> int:
         return self.__width
 
-    # returns the number of rows of the mesh table
-    def rows(self) -> int:
-        return self.get_height() * 2
+    def x_interval(self) -> Tuple[int, int]:
+        return 1, self.get_width() - 1
 
-    # returns the number of columns of the mesh table
-    def columns(self) -> int:
-        return self.get_width() * 2
+    def y_interval(self) -> Tuple[int, int]:
+        return 1, self.get_height() - 1
 
-    def _arrange_rect(self, x: float, y: float) -> Dict[str, Node]:
-        nodes = dict()
-
-        nodes["lower-left"] = self.__grid[y][x]
-        nodes["upper-left"] = self.__grid[y + 1][x]
-        nodes["upper-right"] = self.__grid[y + 1][x + 1]
-        nodes["lower-right"] = self.__grid[y][x + 1]
-
-        return nodes
+    def length(self) -> int:
+        return len(self.__nodes)
 
     # Fills the grid on the field with nodes
-    def _generate_nodes(self) -> list:
-        n, m = self.get_height(), self.get_width()
+    def _generate_nodes(self, heat_source: callable) -> Tuple[list, list]:
+        height, width = self.get_height() - 1, self.get_width() - 1
 
-        grid = [[None for _ in range(m)] for _ in range(n)]
+        grid = [[Dot(x, y) for x in range(width)] for y in range(height)]
 
-        for i in range(n):
-            for j in range(m):
-                grid[i][j] = Node((j, i))
+        nodes = []
 
-        return grid
+        for i in range(height):
+            for j in range(width):
+                if 1 <= i < height and 1 <= j < width:
+                    nodes.append(Node(j, i, heat_source(j, i)))
 
-    # Constructs the rectangular finite elements from the nodes to form mesh
-    def _map_mesh(self, heat_source: callable) -> list:
-        rows, columns = self.get_height() - 1, self.get_width() - 1
+        return grid, nodes
 
-        mesh = [[] for _ in range(rows)]
+    def get_load(self, f: callable) -> np.array:
+        load_vector = np.zeros((self.length(), 1))
 
-        for i in range(0, rows):
-            for j in range(0, columns):
-                nodes = self._arrange_rect(j, i)
-                mesh[i].append(Rectangle(nodes, heat_source))
+        for i in range(self.length()):
+            load_vector[i] = np.dot(f(self.__nodes[i].x(), self.__nodes[i].y()), self.__basis(i, self.__nodes[i]))
 
-        return mesh
+        return load_vector
 
     # Returns the mass matrix of the given finite element
     def get_mass(self):
-        rows, columns = self.get_height(), self.get_width()
+        rows, columns = self.length(), self.length()
         mass_matrix = np.zeros((rows, columns))
 
-        for y in range(rows):
-            for x in range(columns):
-                mass_matrix[y][x] = self.__grid[y][x].i().phi(x, y) * self.__grid[y][x].j().phi(x, y)
+        for k in range(self.__mesh.k()):
+            E = self.__mesh.get_element(k).mass()
+            for i in range(4):
+                print(i, end=" ")
+                y = self.__mesh.get_y(k, i)
+                for j in range(4):
+                    print(j)
+                    x = self.__mesh.get_x(k, j)
+                    mass_matrix[y][x] += E[i][j]
 
         return mass_matrix
 
@@ -92,5 +93,11 @@ class Domain(IDomain):
 
         return stiffness_matrix
 
-    def update_u(self, row: int, column: int, value: float):
-        self.__grid[row][column].set_u(value)
+    def update_u(self, ksi: np.array):
+        for i in range(self.length()):
+            self.__nodes[i].update(self.__basis(i, self.__nodes[i]) * ksi[i][0])
+
+
+dom = Domain((10, 10), lambda x, y: random.randint(1, 10))
+mas = dom.get_mass()
+print()

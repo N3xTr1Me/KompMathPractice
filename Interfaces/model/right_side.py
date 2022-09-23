@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
 
+from Data.grid.dot import Dot
+
 
 class IRightSide(ABC):
 
     @abstractmethod
-    def within(self, x: float, y: float) -> bool:
+    def within(self, dot: Dot) -> bool:
         pass
 
     @abstractmethod
-    def __call__(self, x: float, y: float) -> float:
+    def __call__(self, dot: Dot) -> float:
         pass

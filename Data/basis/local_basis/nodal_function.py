@@ -1,10 +1,11 @@
-from Interfaces.basis.nodal_basis import INodal
+from Interfaces.basis.functions.local_function import ILocal
+from Data.grid.dot import Dot
 
 from typing import Dict
 
 
 # Nodal basis function
-class Phi(INodal):
+class Psi(ILocal):
     def __init__(self, constants: Dict[str, float]):
         required = ["a", "b", "c"]
 
@@ -26,8 +27,8 @@ class Phi(INodal):
     def f(self) -> callable:
         return lambda x, y: self.a() * x + self.b() * y + self.c()
 
-    def __call__(self, x: float, y: float) -> float:
-        return self.f()(x, y)
+    def __call__(self, dot: Dot) -> float:
+        return self.f()(dot.x(), dot.y())
 
     def __str__(self):
         return f"({self.a()})x + ({self.b()})y + ({self.c()})"
