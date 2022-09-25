@@ -1,7 +1,6 @@
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 
 from Data.basis.basis import Basis
-from Data.mesh.cell import Cell
 from Data.mesh.node import Node
 from Data.grid.dot import Dot
 from Data.mesh.rectangle import Rectangle
@@ -19,10 +18,10 @@ class Mesh:
         self.__mesh = []
 
     def width(self) -> int:
-        return self.__x[1] - self.__x[0]
+        return self.__x[1] - self.__x[0] + 1
 
     def height(self) -> int:
-        return self.__y[1] - self.__y[0]
+        return self.__y[1] - self.__y[0] + 1
 
     def x_step(self) -> float:
         return self.__x_step
@@ -40,22 +39,22 @@ class Mesh:
         return 0
 
     def check_bound(self, dot: Dot) -> bool:
-        if self.check_x(dot) and self.check_y(dot):
+        if self.__x[0] < dot.x() < self.__x[1] and self.__y[0] < dot.y() < self.__y[1]:
             return True
 
         return False
 
-    def check_x(self, dot: Dot) -> bool:
-        if self.__x[0] <= dot.x() <= self.__x[1]:
-            return True
+    def left_bound(self, dot: Dot, y_axis: bool = False) -> bool:
+        if y_axis:
+            return True if dot.y() == self.__y[0] else False
 
-        return False
+        return True if dot.x() == self.__x[0] else False
 
-    def check_y(self, dot: Dot) -> bool:
-        if self.__y[0] <= dot.y() <= self.__y[1]:
-            return True
+    def right_bound(self, dot: Dot, y_axis: bool = False) -> bool:
+        if y_axis:
+            return True if dot.y() == self.__y[1] else False
 
-        return False
+        return True if dot.x() == self.__x[1] else False
 
     def get_x(self, element: int, index: int):
         return self.__mesh[element][index].x()
@@ -63,92 +62,205 @@ class Mesh:
     def get_y(self, element: int, index: int):
         return self.__mesh[element][index].y()
 
-    def _arrange_rect(self, nodes: List[Node], index: int) -> List[Dot]:
+    def _node_exists(self, nodes: List[Node], index: int) -> bool:
+        if index < len(nodes):
+            return True
 
-        if index % self.width() == self.width() - 1:
-            return [nodes[index],
-                    nodes[index + self.width()],
-                    Dot(nodes[index].x() + self.x_step(), nodes[index].y() + self.y_step()),
-                    Dot(nodes[index].x() + self.x_step(), nodes[index].y())
-                    ]
+        return False
 
-        return [nodes[index],  # lower-left aka the current node
-                nodes[index + self.width()],  # upper-left node
-                nodes[index + self.width() + 1],  # upper-right node
-                nodes[index + 1]  # lower-left node
-                ]
+    def _make_dot(self, nodes: List[Node], index: int, position: int, target: int) -> Dot:
+        # node is lower-left
+        if position == 0:
+            # target is lower-left
+            if target == 0:
+                return Dot(nodes[index].x(), nodes[index].y())
+
+            # target is upper-left
+            if target == 1:
+                return Dot(nodes[index].x(), nodes[index].y() + self.y_step())
+
+            # target is upper-right
+            if target == 2:
+                return Dot(nodes[index].x() + self.x_step(), nodes[index].y() + self.y_step())
+
+            # target is lower-right
+            if target == 3:
+                return Dot(nodes[index].x() + self.x_step(), nodes[index].y())
+
+            # target_pos if greater than 3
+            raise ValueError(f"No target {target} in a rectangle!")
+
+        # node is upper-left
+        if position == 1:
+            # target is lower-left
+            if target == 0:
+                return Dot(nodes[index].x(), nodes[index].y() - self.y_step())
+
+            # target is upper-left
+            if target == 1:
+                return Dot(nodes[index].x(), nodes[index].y())
+
+            # target is upper-right
+            if target == 2:
+                return Dot(nodes[index].x() + self.x_step(), nodes[index].y())
+
+            # target is lower-right
+            if target == 3:
+                return Dot(nodes[index].x() + self.x_step(), nodes[index].y() - self.y_step())
+
+            # target_pos if greater than 3
+            raise ValueError(f"No target {target} in a rectangle!")
+
+        # node is upper-right
+        if position == 2:
+            # target is lower-left
+            if target == 0:
+                return Dot(nodes[index].x() - self.x_step(), nodes[index].y() - self.y_step())
+
+            # target is upper-left
+            if target == 1:
+                return Dot(nodes[index].x() - self.x_step(), nodes[index].y())
+
+            # target is upper-right
+            if target == 2:
+                return Dot(nodes[index].x(), nodes[index].y())
+
+            # target is lower-right
+            if target == 3:
+                return Dot(nodes[index].x(), nodes[index].y() - self.y_step())
+
+            # target_pos if greater than 3
+            raise ValueError(f"No target {target} in a rectangle!")
+
+        if position == 3:
+            # target is lower-left
+            if target == 0:
+                return Dot(nodes[index].x() - self.x_step(), nodes[index].y())
+
+            # target is upper-left
+            if target == 1:
+                return Dot(nodes[index].x() - self.x_step(), nodes[index].y() + self.y_step())
+
+            # target is upper-right
+            if target == 2:
+                return Dot(nodes[index].x(), nodes[index].y() + self.y_step())
+
+            # target is lower-right
+            if target == 3:
+                return Dot(nodes[index].x(), nodes[index].y())
+
+            # target_pos if greater than 3
+            raise ValueError(f"No target {target} in a rectangle!")
+
+        # position if greater than 3
+        raise ValueError(f"No position {position} in a rectangle!")
+
+    def _get_node(self, nodes: List[Node], index: int, position: int, target_pos: int, shift: int = 0) -> Dot:
+        if self._node_exists(nodes, index + shift) and index % self.width() != self.width() - 1:
+            return nodes[index + shift]
+
+        else:
+            return self._make_dot(nodes, index, position, target_pos)
+
+    def _left_x(self, nodes: List[Node], index: int) -> List[Dot]:
+        # returns a rectangle to the left of Node beyond the left boundary of x
+        return [
+            self._make_dot(nodes, index, 3, 0),
+            self._make_dot(nodes, index, 3, 1),
+            self._get_node(nodes, index, 3, 2, self.width()),
+            nodes[index]
+        ]
+
+    def _right_x(self, nodes: List[Node], index: int) -> List[Dot]:
+
+        return [
+            nodes[index],
+            self._get_node(nodes, index, 0, 1, self.width()),
+            self._make_dot(nodes, index, 0, 2),
+            self._make_dot(nodes, index, 0, 3)
+        ]
+
+    def _left_y(self, nodes: List[Node], index: int) -> List[Dot]:
+
+        return [
+            self._make_dot(nodes, index, 1, 0),
+            nodes[index],
+            self._get_node(nodes, index, 1, 2, 1),
+            self._make_dot(nodes, index, 1, 3)
+        ]
+
+    def _right_y(self, nodes: List[Node], index: int) -> List[Dot]:
+
+        return [
+            nodes[index],
+            self._make_dot(nodes, index, 0, 1),
+            self._make_dot(nodes, index, 0, 2),
+            self._get_node(nodes, index, 0, 3, 1)
+        ]
+
+    def _first_rect(self, nodes: List[Node], index: int) -> List[Dot]:
+
+        return [
+            self._make_dot(nodes, index, 2, 0),
+            self._make_dot(nodes, index, 2, 1),
+            nodes[index],
+            self._make_dot(nodes, index, 2, 3)
+        ]
+
+    def _arrange_rect(self, nodes: List[Node], index: int) -> List[List[Dot]]:
+
+        rects = []
+
+        # in node is on the edges of determined area (lies on the lines determined by x and y interval border values)
+        if not self.check_bound(nodes[index]):
+            # if node is on the left border of x interval
+            if self.left_bound(nodes[index]):
+                rects.append(self._left_x(nodes, index))
+
+            # if node is on the left border of y interval
+            if self.left_bound(nodes[index], True):
+                rects.append(self._left_y(nodes, index))
+
+            # if node is on both x and y left borders
+            if len(rects) >= 2:
+                rects.append(self._first_rect(nodes, index))
+
+            # ----------------------------------------------------------------------------------------------------------
+
+            # if node is on the right border of x interval
+            if self.right_bound(nodes[index]):
+                rects.append(self._right_x(nodes, index))
+
+                return rects
+
+            # if node is on the right border of y interval
+            if self.right_bound(nodes[index], True):
+                rects.append(self._right_y(nodes, index))
+
+                return rects
+
+        rects.append(
+            [nodes[index],
+             self._get_node(nodes, index, 0, 1, self.width()),
+             self._get_node(nodes, index, 0, 2, self.width() + 1),
+             self._get_node(nodes, index, 0, 3, 1),
+             ]
+        )
+
+        return rects
 
     def map_mesh(self, nodes: List[Node]) -> None:
 
         mesh = []
 
-        for i in range(len(nodes) - self.width()):
-
-            if self.check_bound(nodes[i]):
-                vertexes = self._arrange_rect(nodes, i)
-                mesh.append(Rectangle(vertexes))
+        for i in range(len(nodes)):
+            rects = self._arrange_rect(nodes, i)
+            for rect in rects:
+                print(rect)
+                mesh.append(Rectangle(rect))
+            print()
 
         self.__mesh = mesh
-
-    def change_neighbours(self, nodes: Dict[str, Node]):
-
-        connections = {node: {} for node in nodes}
-
-        for node in nodes:
-            rects = self.__mesh[node]
-
-            for i in range(len(rects)):
-                x_side, y_side = rects[i].side(), rects[i].side(True)
-
-                # node is upper-right
-                if i == 0:
-                    up_left = f"{nodes[node].x() - x_side, nodes[node].y()}"
-                    low_right = f"{nodes[node].x(), nodes[node].y() - y_side}"
-                    if up_left in nodes:
-                        rects[i].update_dot(x=0, y=1, dot=nodes[up_left])
-                        connections[node][i] = 0, 1
-
-                    if low_right in nodes:
-                        rects[i].update_dot(x=1, y=0, dot=nodes[low_right])
-                        connections[node][i] = 1, 0
-
-                # node is lower-right
-                elif i == 1:
-                    up_right = f"{nodes[node].x(), nodes[node].y() + y_side}"
-                    low_left = f"{nodes[node].x() - x_side, nodes[node].y()}"
-                    if up_right in nodes:
-                        rects[i].update_dot(x=1, y=1, dot=nodes[up_right])
-                        connections[node][i] = 1, 1
-
-                    if low_left in nodes:
-                        rects[i].update_dot(x=0, y=0, dot=nodes[low_left])
-                        connections[node][i] = 0, 0
-
-                # node is lower-left
-                elif i == 2:
-                    up_left = f"{nodes[node].x(), nodes[node].y() + y_side}"
-                    low_right = f"{nodes[node].x() + x_side, nodes[node].y()}"
-                    if up_left in nodes:
-                        rects[i].update_dot(x=0, y=1, dot=nodes[up_left])
-                        connections[node][i] = 0, 1
-
-                    if low_right in nodes:
-                        rects[i].update_dot(x=1, y=0, dot=nodes[low_right])
-                        connections[node][i] = 1, 0
-
-                # node is upper-left
-                else:
-                    up_right = f"{nodes[node].x() + x_side, nodes[node].y()}"
-                    low_left = f"{nodes[node].x(), nodes[node].y() - y_side}"
-                    if up_right in nodes:
-                        rects[i].update_dot(x=1, y=1, dot=nodes[up_right])
-                        connections[node][i] = 1, 1
-
-                    if low_left in nodes:
-                        rects[i].update_dot(x=0, y=0, dot=nodes[low_left])
-                        connections[node][i] = 0, 0
-
-        return connections
 
     def basis(self, nodes: List[Node]) -> Basis:
         constants = []

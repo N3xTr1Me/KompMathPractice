@@ -44,7 +44,7 @@ class Domain(IDomain):
 
     # Fills the grid on the field with nodes
     def _generate_nodes(self, heat_source: callable) -> Tuple[list, list]:
-        height, width = self.get_height() - 1, self.get_width() - 1
+        height, width = self.get_height(), self.get_width()
 
         grid = [[Dot(x, y) for x in range(width)] for y in range(height)]
 
@@ -52,7 +52,7 @@ class Domain(IDomain):
 
         for i in range(height):
             for j in range(width):
-                if 1 <= i < height and 1 <= j < width:
+                if 1 <= i <= height and 1 <= j <= width:
                     nodes.append(Node(j, i, heat_source(j, i)))
 
         return grid, nodes
@@ -73,10 +73,8 @@ class Domain(IDomain):
         for k in range(self.__mesh.k()):
             E = self.__mesh.get_element(k).mass()
             for i in range(4):
-                print(i, end=" ")
                 y = self.__mesh.get_y(k, i)
                 for j in range(4):
-                    print(j)
                     x = self.__mesh.get_x(k, j)
                     mass_matrix[y][x] += E[i][j]
 
@@ -98,6 +96,6 @@ class Domain(IDomain):
             self.__nodes[i].update(self.__basis(i, self.__nodes[i]) * ksi[i][0])
 
 
-dom = Domain((10, 10), lambda x, y: random.randint(1, 10))
+dom = Domain((5, 5), lambda x, y: random.randint(1, 10))
 mas = dom.get_mass()
 print()
