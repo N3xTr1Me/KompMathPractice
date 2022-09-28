@@ -1,11 +1,11 @@
-from Interfaces.basis.functions.local_function import ILocal
+from Interfaces.basis.functions.elemental_function import IElemental
 from Data.grid.dot import Dot
 
 from typing import Dict
 
 
 # Nodal basis function
-class Psi(ILocal):
+class Psi(IElemental):
     def __init__(self, constants: Dict[str, float]):
         required = ["a", "b", "c"]
 

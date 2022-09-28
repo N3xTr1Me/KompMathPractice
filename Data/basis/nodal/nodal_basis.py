@@ -1,8 +1,8 @@
 from Data.grid.dot import Dot
 from Interfaces.basis.basis_interface import IBasis
 
-from Data.basis.global_basis.global_function import Phi
-from Data.basis.global_basis.global_derivative import DPhi
+from Data.basis.nodal.function import Phi
+from Data.basis.nodal.derivative import DPhi
 
 from typing import Dict, List
 

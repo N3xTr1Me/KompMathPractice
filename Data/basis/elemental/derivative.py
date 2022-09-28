@@ -1,6 +1,6 @@
 import numpy as np
 
-from Data.basis.local_basis.nodal_function import Psi
+from Data.basis.elemental.function import Psi
 from Data.grid.dot import Dot
 
 from typing import Dict

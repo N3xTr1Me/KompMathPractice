@@ -1,8 +1,8 @@
 from typing import List, Dict
 
-from Data.basis.basis import Basis
-from Data.basis.local_basis.nodal_function import Psi
-from Data.basis.local_basis.nodal_derivative import DPsi
+from Data.basis.nodal.nodal_basis import Basis
+from Data.basis.elemental.function import Psi
+from Data.basis.elemental.derivative import DPsi
 
 
 class Elemental(Basis):
