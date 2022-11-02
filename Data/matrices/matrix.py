@@ -40,7 +40,7 @@ class Matrix(IMatrix, IDecomposition):
         return self._columns
 
     # Fills matrix with values (zeroes).
-    def _fill(self) -> None:
+    def _fill_zeroes(self) -> None:
         self._matrix = np.zeros((self.rows(), self.columns()))
 
     # ------------------------------------------------------------------------------------------------------------------
