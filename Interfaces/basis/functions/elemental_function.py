@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from Data.grid.dot import Dot
 
 
-class ILocal(ABC):
+class IElemental(ABC):
 
     @abstractmethod
     def a(self) -> float:

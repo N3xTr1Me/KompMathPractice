@@ -4,9 +4,6 @@ import numpy as np
 
 
 class IMatrix(ABC):
-    @abstractmethod
-    def _fill(self) -> None:
-        pass
 
     @abstractmethod
     def rows(self) -> int:

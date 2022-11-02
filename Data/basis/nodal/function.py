@@ -1,9 +1,9 @@
-from Interfaces.basis.functions.global_function import IGlobal
+from Interfaces.basis.functions.nodal_function import INodal
 
 from Data.grid.dot import Dot
 
 
-class Phi(IGlobal):
+class Phi(INodal):
     def __init__(self, constants: dict):
         self._k = constants["k"]
 
@@ -23,3 +23,6 @@ class Phi(IGlobal):
 
     def __call__(self, dot: Dot):
         return self.f()(dot.x(), dot.y())
+
+    def __repr__(self):
+        return f"({self.xk()} - x) * ({self.yk()} - y) / {self._h}"

@@ -1,6 +1,6 @@
 import numpy as np
 
-from Data.basis.global_basis.global_function import Phi
+from Data.basis.nodal.function import Phi
 
 
 class DPhi(Phi):
@@ -15,3 +15,6 @@ class DPhi(Phi):
 
     def f(self) -> callable:
         return lambda x, y: np.array([self.dy(x), self.dx(y)])
+
+    def __repr__(self):
+        return f"[(y - {self._k.y()}) / {self._h}, (x - {self._k.x()}) / {self._h}]"

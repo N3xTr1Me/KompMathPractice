@@ -4,17 +4,17 @@ from typing import Tuple
 
 
 class Dot(IDot):
-    def __init__(self, x: float, y: float):
+    def __init__(self, x: int, y: int):
         self._x = x
         self._y = y
 
-    def x(self) -> float:
+    def x(self) -> int:
         return self._x
 
-    def y(self) -> float:
+    def y(self) -> int:
         return self._y
 
-    def coords(self) -> Tuple[float, float]:
+    def coords(self) -> Tuple[int, int]:
         return self.x(), self.y()
 
     def __repr__(self):
