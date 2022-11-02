@@ -1,7 +1,7 @@
 from Interfaces.mesh.finite_element import IFinite
 
 from Data.grid.dot import Dot
-from Data.basis.local_basis.elemental_basis import Elemental
+from Data.basis.elemental.elemental_basis import Elemental
 
 from typing import Dict, List
 import numpy as np
@@ -31,7 +31,7 @@ class Rectangle(IFinite):
             # side length
             self.__h = self._get_h(nodes)
 
-            # local_basis basis of element
+            # elemental basis of element
             self.__basis = Elemental(self._constants())
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -92,8 +92,8 @@ class Rectangle(IFinite):
     def upper_right(self) -> Dot:
         return self.__nodes[2]
 
-    def get_dot(self, index: int) -> Dot:
-        return self.__nodes[index]
+    def diagonal(self, position: int) -> Dot:
+        return self.__nodes[3 - position]
 
     def update_dot(self, index: int, dot: Dot):
         if self._check_dot(index, dot):
@@ -105,7 +105,7 @@ class Rectangle(IFinite):
     # ------------------------------------------------------------------------------------------------------------------
 
     def _midpoint(self, start: Dot, end: Dot) -> Dot:
-        return Dot(x=(end.x() + start.x()) / 2, y=(end.y() + start.y()) / 2)
+        return Dot(x=(end.x() + start.x()) // 2, y=(end.y() + start.y()) // 2)
 
     def _edge(self, i: int, j: int) -> Dot:
 
@@ -117,7 +117,7 @@ class Rectangle(IFinite):
 
         return Dot(0, 0)
 
-    # Returns the local_basis elemental mass matrix
+    # Returns the elemental mass matrix
     def mass(self) -> np.array:
         mass_matrix = np.zeros((4, 4), dtype=float)
 
@@ -128,7 +128,7 @@ class Rectangle(IFinite):
 
         return mass_matrix
 
-    # Returns the local_basis elemental stiffness matrix
+    # Returns the elemental stiffness matrix
     def stiffness(self) -> np.array:
         stiffness_matrix = np.zeros((4, 4), dtype=float)
 
@@ -139,8 +139,8 @@ class Rectangle(IFinite):
 
         return stiffness_matrix
 
-    def __getitem__(self, item):
-        return self.__nodes[item]
+    def __getitem__(self, index: int) -> Dot:
+        return self.__nodes[index]
 
     def __repr__(self):
         string = "|"
@@ -151,12 +151,3 @@ class Rectangle(IFinite):
         string += "|"
 
         return string
-
-# ll = Dot(2, 2)
-# ul = Dot(2, 3)
-# ur = Dot(3, 3)
-# lr = Dot(3, 2)
-#
-# rect = Rectangle([ll, ul, ur, lr])
-# print(rect.mass())
-# print(rect.stiffness())
