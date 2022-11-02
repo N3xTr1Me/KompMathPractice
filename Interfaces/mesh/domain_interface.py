@@ -11,19 +11,15 @@ class IDomain(ABC):
         pass
 
     @abstractmethod
-    def _generate_nodes(self, heat_source: callable) -> list:
-        pass
-
-    @abstractmethod
     def get_load(self, f: callable) -> array:
         pass
 
     @abstractmethod
-    def get_mass(self) -> array:
+    def mass_matrix(self) -> array:
         pass
 
     @abstractmethod
-    def get_stiffness(self) -> array:
+    def stiffness_matrix(self) -> array:
         pass
 
     @abstractmethod
